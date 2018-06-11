@@ -210,92 +210,101 @@ resize:
   mov     cx, [newSize]
   mov     si, [ptr]
 
-test ax, 0x1234
-  ; Release ptr if newSize is 0
+  ; If newSize is 0, release ptr
   test    cx, cx
-  jnz     .NewSizeNotZero
-  push    si
-  call    free
-  mov     word [ptrNew], 0
-  jmp     .Exit
- .NewSizeNotZero:
-test ax, 0x4321
+  jz      .ReleasePtr
 
-
-test ax, 0x1234
-  ; Allocate ptr if null
+  ; If ptr is null, delegate to alloc
   test    si, si
-  jnz     .PtrNotNull
+  jnz     .endif0
   push    cx
   call    alloc
   mov     [ptrNew], ax
   jmp     .Exit
- .PtrNotNull:
-test ax, 0x4321
+ .endif0:
 
-test ax, 0x1234
-  ; Validate ptr bounds
-  sub     si, SIZEOF_HEAPITEM
-  cmp     si, heapData
-  jb      .Exit
-  cmp     si, heapDataEnd
-  jae     .Exit
-test ax, 0x4321
+  ; Initialize tmpPtr and nextPtr
+  mov     bx, [bx + HEAPITEM_SIZE]
+  add     bx, si
+  add     bx, SIZEOF_HEAPITEM
 
-test ax, 0x1234
-  ; Move data to larger memory block, or grow in place
-  mov     dx, [si + HEAPITEM_SIZE]
-  cmp     cx, dx
-  jbe     .SkipGrow
-  mov     di, si
+  mov     di, cx
+  add     di, si
   add     di, SIZEOF_HEAPITEM
-  add     di, dx
-  cmp     di, heapDataEnd
-  jae     .Exit
-  add     dx, [di + HEAPITEM_SIZE]
-  cmp     word [di + HEAPITEM_SIG], SIG_FREEBLOCK
-  je      .SplitGrowth
+
+  ; Attempt to shrink memory in place
+ .ShrinkPtr:
+  cmp     [si + HEAPITEM_SIZE], cx
+  ja      .endif1
+  mov     dx, [si + HEAPITEM_SIZE]
+  mov     [si + HEAPITEM_SIZE], cx
+  jmp     .CheckGap
+ .endif1:
+
+  ; Attempt to grow using alloc if tmpPtr is out of heapData bounds
+  cmp     bx, heapData
+  jae     .endif2
+  cmp     bx, heapDataEnd
+  jb      .endif2
+  jmp     .GrowAlloc
+ .endif2:
+
+  ; Attempt to grow memory into the next free block
+ .GrowPtr:
+  cmp     word [bx + HEAPITEM_SIG], SIG_FREEBLOCK
+  jne     .endif3
+
+  mov     dx, [si + HEAPITEM_SIZE]
+  add     dx, [bx + HEAPITEM_SIZE]
+
   cmp     cx, dx
-  jbe     .SplitGrowth
+  jae     .endif3
+
+  mov     [si + HEAPITEM_SIZE], cx
+ .endif3:
+
+  ; Temporarily release free block header, then absorb or merge gap
+ .CheckGap:
+  mov     ax, dx
+  sub     ax, cx
+
+  cmp     di, heapDataEnd
+  jb      .endif4
+  jmp     .Exit
+ .endif4:
+
+  cmp     word [di + HEAPITEM_SIZE], SIG_FREEBLOCK
+  jne     .endif4b
+  mov     word [bx + HEAPITEM_SIZE], 0
+  add     ax, SIZEOF_HEAPITEM
+ .endif4b:
+
+  cmp     ax, ALLOC_MINSIZE
+  jb      .endif5
+  mov     word [di + HEAPITEM_SIZE], ALLOC_MINSIZE + SIZEOF_HEAPITEM
+  jmp     .Exit
+ .endif5:
+  add     [si + HEAPITEM_SIZE], ax
+  jmp     .Exit
+
+  ; If all else fails, attempt to resize using alloc
+ .GrowAlloc:
   push    cx
   call    alloc
   test    ax, ax
-  jz      .Exit
+  jnz     .endif6
+  jmp     .Exit
+ .endif6:
   mov     [ptrNew], ax
-  mov     si, [ptr]
   mov     di, ax
   mov     cx, [si + HEAPITEM_SIZE]
+  add     si, SIZEOF_HEAPITEM
   rep movsb
+ .ReleasePtr:
   push    word [ptr]
   call    free
-  jmp     .Exit
- .SplitGrowth:
-  mov     word [di + HEAPITEM_SIG], 0
-  mov     di, si
-  add     di, SIZEOF_HEAPITEM
-  add     di, cx
-  cmp     di, heapDataEnd
-  jae     .Exit
-  mov     ax, dx
-  sub     ax, cx
-  cmp     ax, ALLOC_MINSIZE
-  jae     .GrowthSplitGap
-  add     cx, ax
-  mov     [si + HEAPITEM_SIZE], cx
-  jmp     .Exit
- .GrowthSplitGap:
-  mov     [si + HEAPITEM_SIZE], cx
-  mov     word [di + HEAPITEM_SIG], SIG_FREEBLOCK
-  mov     [di + HEAPITEM_SIZE], ax
-  jmp     .Exit
- .SkipGrow:
-test ax, 0x4321
 
-test ax, 0x1234
-  ; Shrink in place
-  
-test ax, 0x4321
-
+  ; Clean up and exit
  .Exit:
   mov     ax, [ptrNew]
 
