@@ -209,6 +209,7 @@ resize:
 
   mov     cx, [newSize]
   mov     si, [ptr]
+  sub     si, SIZEOF_HEAPITEM
 
   ; If newSize is 0, release ptr
   test    cx, cx
@@ -216,15 +217,15 @@ resize:
 
   ; If ptr is null, delegate to alloc
   test    si, si
-  jnz     .endif0
+  jnz     .endDelegateAlloc
   push    cx
   call    alloc
   mov     [ptrNew], ax
   jmp     .Exit
- .endif0:
+ .endDelegateAlloc:
 
   ; Initialize tmpPtr and nextPtr
-  mov     bx, [bx + HEAPITEM_SIZE]
+  mov     bx, [si + HEAPITEM_SIZE]
   add     bx, si
   add     bx, SIZEOF_HEAPITEM
 
@@ -235,33 +236,31 @@ resize:
   ; Attempt to shrink memory in place
  .ShrinkPtr:
   cmp     [si + HEAPITEM_SIZE], cx
-  ja      .endif1
+  ja      .endShrinkPtr1
   mov     dx, [si + HEAPITEM_SIZE]
   mov     [si + HEAPITEM_SIZE], cx
   jmp     .CheckGap
- .endif1:
+ .endShrinkPtr1:
 
   ; Attempt to grow using alloc if tmpPtr is out of heapData bounds
   cmp     bx, heapData
-  jae     .endif2
+  jb      .GrowAlloc
   cmp     bx, heapDataEnd
-  jb      .endif2
-  jmp     .GrowAlloc
- .endif2:
+  jae     .GrowAlloc
 
   ; Attempt to grow memory into the next free block
  .GrowPtr:
   cmp     word [bx + HEAPITEM_SIG], SIG_FREEBLOCK
-  jne     .endif3
+  jne     .endGrowPtr1
 
   mov     dx, [si + HEAPITEM_SIZE]
   add     dx, [bx + HEAPITEM_SIZE]
 
   cmp     cx, dx
-  jae     .endif3
+  jae     .endGrowPtr1
 
   mov     [si + HEAPITEM_SIZE], cx
- .endif3:
+ .endGrowPtr1:
 
   ; Temporarily release free block header, then absorb or merge gap
  .CheckGap:
@@ -269,21 +268,21 @@ resize:
   sub     ax, cx
 
   cmp     di, heapDataEnd
-  jb      .endif4
-  jmp     .Exit
- .endif4:
+  jae     .Exit
 
-  cmp     word [di + HEAPITEM_SIZE], SIG_FREEBLOCK
-  jne     .endif4b
-  mov     word [bx + HEAPITEM_SIZE], 0
+  cmp     word [di + HEAPITEM_SIG], SIG_FREEBLOCK
+  jne     .endCheckGap1
+  mov     word [bx + HEAPITEM_SIG], 0
   add     ax, SIZEOF_HEAPITEM
- .endif4b:
+ .endCheckGap1:
 
   cmp     ax, ALLOC_MINSIZE
-  jb      .endif5
+  jb      .endCheckGap2
+  mov     word [di + HEAPITEM_SIG], SIG_FREEBLOCK
   mov     word [di + HEAPITEM_SIZE], ALLOC_MINSIZE + SIZEOF_HEAPITEM
   jmp     .Exit
- .endif5:
+ .endCheckGap2:
+
   add     [si + HEAPITEM_SIZE], ax
   jmp     .Exit
 
@@ -291,15 +290,17 @@ resize:
  .GrowAlloc:
   push    cx
   call    alloc
-  test    ax, ax
-  jnz     .endif6
-  jmp     .Exit
- .endif6:
-  mov     [ptrNew], ax
-  mov     di, ax
+  mov     bx, ax
+
+  test    bx, bx
+  jz      .Exit
+
+  mov     [ptrNew], bx
+  mov     di, bx
   mov     cx, [si + HEAPITEM_SIZE]
   add     si, SIZEOF_HEAPITEM
   rep movsb
+
  .ReleasePtr:
   push    word [ptr]
   call    free
