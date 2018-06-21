@@ -29,39 +29,68 @@ run:
   mov     word [heapData + HEAPITEM_SIG],  SIG_FREEBLOCK
   mov     word [heapData + HEAPITEM_SIZE], SIZE_HEAPDATA
 
-  push    word 8192
-  call    alloc
-  mov     [ptr1], ax
-
-  push    word 8192
-  call    alloc
-  mov     [ptr2], ax
-
-push ptr1
-call free
-push word 8192
-call alloc
-mov  [ptr1], ax
-
-  push    word 8192
-  call    alloc
-  mov     [ptr3], ax
+  push    word 0
+  push    4096
+  call    resize
 
   push    word ptr1
-  call    free
-
-  push    word ptr2
-  call    free
-
-  push    word ptr3
   call    free
 
   mov     ax, 0x4C00
   int     0x21
 
 ptr1: dw 0
-ptr2: dw 0
-ptr3: dw 0
+
+;
+; func resize( &ptr, uint newSize )
+;
+resize:
+  push    bp
+  mov     bp, sp
+  %define newSize bp + 4
+  %define ptr     bp + 6
+  %define .result bp - 2
+  push    word [ptr] ; result = ptr
+
+  ; ax = gap         bx = tmpPtr
+  ; cx = newSize     si = ptr
+  ; dx = totalSize   di = nextPtr
+
+  ; Initialize parameters
+  mov     cx, [newSize]
+  mov     si, [ptr]
+  sub     si, SIZEOF_HEAPITEM
+
+  ; Release pointer if newSize is 0
+  test    cx, cx
+  ;jz      .ReleasePtr
+  jnz     .SkipReleasePtr
+  push    word [ptr]
+  call    free
+  jmp     .Exit
+ .SkipReleasePtr:
+
+  ; Allocate pointer if ptr is null/invalid
+  cmp     si, heapData
+  jb      .DelegateAlloc
+  cmp     si, heapDataEnd
+  jae     .DelegateAlloc
+  nop
+  jmp     .SkipDelegateAlloc
+ .DelegateAlloc:
+  push    cx
+  call    alloc
+  mov     [.result], ax
+  jmp     .Exit
+ .SkipDelegateAlloc:
+
+  ; Clean up and exit
+ .Exit:
+  mov     ax, [.result]
+
+  mov     sp, bp
+  pop     bp
+  ret 4
 
 ;
 ; func @ alloc( uint size )
@@ -195,123 +224,6 @@ free:
   mov     sp, bp
   pop     bp
   ret 2
-
-;
-; func resize( &ptr, uint newSize )
-;
-resize:
-  push    bp
-  mov     bp, sp
-  %define ptr bp + 4
-  %define newSize bp + 6
-  %define ptrNew bp - 2
-  push    word [ptr]
-
-  mov     cx, [newSize]
-  mov     si, [ptr]
-  sub     si, SIZEOF_HEAPITEM
-
-  ; If newSize is 0, release ptr
-  test    cx, cx
-  jz      .ReleasePtr
-
-  ; If ptr is null, delegate to alloc
-  test    si, si
-  jnz     .endDelegateAlloc
-  push    cx
-  call    alloc
-  mov     [ptrNew], ax
-  jmp     .Exit
- .endDelegateAlloc:
-
-  ; Initialize tmpPtr and nextPtr
-  mov     bx, [si + HEAPITEM_SIZE]
-  add     bx, si
-  add     bx, SIZEOF_HEAPITEM
-
-  mov     di, cx
-  add     di, si
-  add     di, SIZEOF_HEAPITEM
-
-  ; Attempt to shrink memory in place
- .ShrinkPtr:
-  cmp     [si + HEAPITEM_SIZE], cx
-  ja      .endShrinkPtr1
-  mov     dx, [si + HEAPITEM_SIZE]
-  mov     [si + HEAPITEM_SIZE], cx
-  jmp     .CheckGap
- .endShrinkPtr1:
-
-  ; Attempt to grow using alloc if tmpPtr is out of heapData bounds
-  cmp     bx, heapData
-  jb      .GrowAlloc
-  cmp     bx, heapDataEnd
-  jae     .GrowAlloc
-
-  ; Attempt to grow memory into the next free block
- .GrowPtr:
-  cmp     word [bx + HEAPITEM_SIG], SIG_FREEBLOCK
-  jne     .endGrowPtr1
-
-  mov     dx, [si + HEAPITEM_SIZE]
-  add     dx, [bx + HEAPITEM_SIZE]
-
-  cmp     cx, dx
-  jae     .endGrowPtr1
-
-  mov     [si + HEAPITEM_SIZE], cx
- .endGrowPtr1:
-
-  ; Temporarily release free block header, then absorb or merge gap
- .CheckGap:
-  mov     ax, dx
-  sub     ax, cx
-
-  cmp     di, heapDataEnd
-  jae     .Exit
-
-  cmp     word [di + HEAPITEM_SIG], SIG_FREEBLOCK
-  jne     .endCheckGap1
-  mov     word [bx + HEAPITEM_SIG], 0
-  add     ax, SIZEOF_HEAPITEM
- .endCheckGap1:
-
-  cmp     ax, ALLOC_MINSIZE
-  jb      .endCheckGap2
-  mov     word [di + HEAPITEM_SIG], SIG_FREEBLOCK
-  mov     word [di + HEAPITEM_SIZE], ALLOC_MINSIZE + SIZEOF_HEAPITEM
-  jmp     .Exit
- .endCheckGap2:
-
-  add     [si + HEAPITEM_SIZE], ax
-  jmp     .Exit
-
-  ; If all else fails, attempt to resize using alloc
- .GrowAlloc:
-  push    cx
-  call    alloc
-  mov     bx, ax
-
-  test    bx, bx
-  jz      .Exit
-
-  mov     [ptrNew], bx
-  mov     di, bx
-  mov     cx, [si + HEAPITEM_SIZE]
-  add     si, SIZEOF_HEAPITEM
-  rep movsb
-
- .ReleasePtr:
-  push    word [ptr]
-  call    free
-
-  ; Clean up and exit
- .Exit:
-  mov     ax, [ptrNew]
-
-  mov     sp, bp
-  pop     bp
-  ret 4
 
 maxAvail: dw SIZE_HEAPDATA
 memAvail: dw SIZE_HEAPDATA
