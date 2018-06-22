@@ -29,16 +29,26 @@ run:
   mov     word [heapData + HEAPITEM_SIG],  SIG_FREEBLOCK
   mov     word [heapData + HEAPITEM_SIZE], SIZE_HEAPDATA
 
+  ; Test case: Validate ptr
   push    word heapData + SIZEOF_HEAPITEM
   push    2048
   call    resize
 
+  ; Test case: Delegate alloc
   push    word 0
   push    4096
   call    resize
 
+  ; Test case: Release ptr
   push    ax
   push    word 0
+  call    resize
+
+  ; Test case: Shrink ptr
+  push    4096
+  call    alloc
+  push    ax
+  push    2048
   call    resize
 
   push    word ptr1
