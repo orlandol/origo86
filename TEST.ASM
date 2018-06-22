@@ -29,8 +29,16 @@ run:
   mov     word [heapData + HEAPITEM_SIG],  SIG_FREEBLOCK
   mov     word [heapData + HEAPITEM_SIZE], SIZE_HEAPDATA
 
+  push    word heapData + SIZEOF_HEAPITEM
+  push    2048
+  call    resize
+
   push    word 0
   push    4096
+  call    resize
+
+  push    ax
+  push    word 0
   call    resize
 
   push    word ptr1
@@ -63,12 +71,13 @@ resize:
 
   ; Release pointer if newSize is 0
   test    cx, cx
-  ;jz      .ReleasePtr
   jnz     .SkipReleasePtr
-  push    word [ptr]
+  lea     ax, [ptr]
+  push    ax
   call    free
+  mov     word [.result], 0
   jmp     .Exit
- .SkipReleasePtr:
+  .SkipReleasePtr:
 
   ; Allocate pointer if ptr is null/invalid
   cmp     si, heapData
@@ -83,6 +92,34 @@ resize:
   mov     [.result], ax
   jmp     .Exit
  .SkipDelegateAlloc:
+
+  ; Initialize tmpPtr
+  mov     bx, [si + HEAPITEM_SIZE]
+  add     bx, si
+  add     bx, SIZEOF_HEAPITEM
+
+  ; Initialize nextPtr
+  mov     di, cx
+  add     di, si
+  add     di, SIZEOF_HEAPITEM
+
+  ; Shrink pointer
+  cmp     cx, [si + HEAPITEM_SIZE]
+  jae     .SkipShrinkPtr
+  mov     dx, [si + HEAPITEM_SIZE]
+  mov     [si + HEAPITEM_SIZE], cx
+  jmp     .ProcessGap
+ .SkipShrinkPtr:
+
+  ; TODO: Merge or absorb gap
+ .ProcessGap:
+
+  ; Validate pointer header
+  cmp    word [si + HEAPITEM_SIG], SIG_USEDBLOCK
+  je     .SkipInvalidPtr
+  mov    word [.result], 0
+  jmp    .Exit
+ .SkipInvalidPtr:
 
   ; Clean up and exit
  .Exit:
