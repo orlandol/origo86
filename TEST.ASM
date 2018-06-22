@@ -113,6 +113,11 @@ resize:
   add     di, si
   add     di, SIZEOF_HEAPITEM
 
+  ; Validate nextPtr
+  cmp     di, heapDataEnd ; Pointer after heap end not valid
+  ja      .Exit
+  je      .AbsorbGap ; Pointer at heap end valid?
+
   ; Shrink pointer
   cmp     cx, [si + HEAPITEM_SIZE]
   jae     .SkipShrinkPtr
@@ -123,6 +128,9 @@ resize:
 
   ; TODO: Merge or absorb gap
  .ProcessGap:
+
+ .AbsorbGap:
+  ; TODO: Add gap to ptr.size
 
   ; Validate pointer header
   cmp    word [si + HEAPITEM_SIG], SIG_USEDBLOCK
