@@ -50,6 +50,7 @@ run:
   push    ax
   push    2048
   call    resize
+  mov     [ptr1], ax
 
   push    word ptr1
   call    free
@@ -70,6 +71,7 @@ resize:
   %define .result bp - 2
   push    word [ptr] ; result = ptr
 
+  ; Register assignments:
   ; ax = gap         bx = tmpPtr
   ; cx = newSize     si = ptr
   ; dx = totalSize   di = nextPtr
@@ -114,9 +116,11 @@ resize:
   add     di, SIZEOF_HEAPITEM
 
   ; Validate nextPtr
-  cmp     di, heapDataEnd ; Pointer after heap end not valid
+  cmp     di, heapData
+  jb      .Exit
+  cmp     di, heapDataEnd
   ja      .Exit
-  je      .AbsorbGap ; Pointer at heap end valid?
+  je      .AbsorbGap
 
   ; Shrink pointer
   cmp     cx, [si + HEAPITEM_SIZE]
