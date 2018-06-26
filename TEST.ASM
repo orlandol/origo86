@@ -105,6 +105,13 @@ resize:
   jmp     .Exit
  .SkipDelegateAlloc:
 
+  ; Validate ptr header
+  cmp    word [si + HEAPITEM_SIG], SIG_USEDBLOCK
+  je     .SkipInvalidPtr
+  mov    word [.result], 0
+  jmp    .Exit
+ .SkipInvalidPtr:
+
   ; Initialize tmpPtr
   mov     bx, [si + HEAPITEM_SIZE]
   add     bx, si
@@ -115,14 +122,7 @@ resize:
   add     di, si
   add     di, SIZEOF_HEAPITEM
 
-  ; Validate nextPtr
-  cmp     di, heapData
-  jb      .Exit
-  cmp     di, heapDataEnd
-  ja      .Exit
-  je      .AbsorbGap
-
-  ; Shrink pointer
+  ; Shrink ptr
   cmp     cx, [si + HEAPITEM_SIZE]
   jae     .SkipShrinkPtr
   mov     dx, [si + HEAPITEM_SIZE]
@@ -130,18 +130,36 @@ resize:
   jmp     .ProcessGap
  .SkipShrinkPtr:
 
+  ; Grow ptr
+  cmp     bx, heapData
+  jb      .Exit
+  cmp     bx, heapDataEnd
+  ja      .Exit
+
+  mov     dx, [si + HEAPITEM_SIZE]
+  add     dx, [bx + HEAPITEM_SIZE]
+
+  cmp     cx, dx
+  jae     .SkipGrowPtr
+  ; TODO: Grow ptr
+  jmp     .ProcessGap
+ .SkipGrowPtr:
+
+  ; TODO: Fallback to alloc/copy/free
+
   ; TODO: Merge or absorb gap
  .ProcessGap:
 
  .AbsorbGap:
   ; TODO: Add gap to ptr.size
 
-  ; Validate pointer header
-  cmp    word [si + HEAPITEM_SIG], SIG_USEDBLOCK
-  je     .SkipInvalidPtr
-  mov    word [.result], 0
-  jmp    .Exit
- .SkipInvalidPtr:
+ .MergeGap:
+  ; Validate nextPtr
+  cmp     di, heapData
+  jb      .Exit
+  cmp     di, heapDataEnd
+  ja      .Exit
+  je      .AbsorbGap
 
   ; Clean up and exit
  .Exit:
