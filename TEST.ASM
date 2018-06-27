@@ -145,7 +145,25 @@ resize:
   jmp     .ProcessGap
  .SkipGrowPtr:
 
-  ; TODO: Fallback to alloc/copy/free
+  ; Fallback to alloc/copy/free
+ .GrowAlloc:
+  push    cx
+  call    alloc
+  test    ax, ax
+  jz      .Exit
+
+  mov     [.result], ax
+
+  mov     di, ax
+  mov     si, [ptr]
+  mov     cx, [si + HEAPITEM_SIZE]
+  rep movsb
+
+ .ReleasePtr:
+  lea     ax, [ptr]
+  push    ax
+  call    free
+  ;jmp     .ProcessGap
 
   ; TODO: Merge or absorb gap
  .ProcessGap:
