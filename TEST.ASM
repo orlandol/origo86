@@ -141,7 +141,10 @@ resize:
 
   cmp     cx, dx
   jae     .SkipGrowPtr
-  ; TODO: Grow ptr
+  cmp     word [bx + HEAPITEM_SIG], SIG_FREEBLOCK
+  jne     .SkipGrowPtr
+
+  mov     [si + HEAPITEM_SIZE], cx
   jmp     .ProcessGap
  .SkipGrowPtr:
 
@@ -159,25 +162,29 @@ resize:
   mov     cx, [si + HEAPITEM_SIZE]
   rep movsb
 
- .ReleasePtr:
   lea     ax, [ptr]
   push    ax
   call    free
-  ;jmp     .ProcessGap
 
-  ; TODO: Merge or absorb gap
+  ; Merge or absorb gap
  .ProcessGap:
+  mov     ax, dx
+  sub     ax, cx
+  cmp     ax, ALLOC_MINSIZE
+  jae     .MergeGap
 
+  ; Absorb gap into ptr.size
  .AbsorbGap:
-  ; TODO: Add gap to ptr.size
+  add     [si + HEAPITEM_SIZE], ax
+  jmp     .Exit
 
+  ; TODO: Merge gap with next free block
  .MergeGap:
   ; Validate nextPtr
   cmp     di, heapData
   jb      .Exit
   cmp     di, heapDataEnd
-  ja      .Exit
-  je      .AbsorbGap
+  jae     .Exit
 
   ; Clean up and exit
  .Exit:
