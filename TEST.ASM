@@ -132,21 +132,23 @@ resize:
 
   ; Grow ptr
   cmp     bx, heapData
-  jb      .Exit
+  jb      .Exit ; .GrowAlloc?
   cmp     bx, heapDataEnd
-  ja      .Exit
+  jae     .Exit ; .GrowAlloc?
 
   mov     dx, [si + HEAPITEM_SIZE]
   add     dx, [bx + HEAPITEM_SIZE]
 
   cmp     cx, dx
-  jae     .SkipGrowPtr
+  jae     .GrowAlloc
   cmp     word [bx + HEAPITEM_SIG], SIG_FREEBLOCK
-  jne     .SkipGrowPtr
+  jne     .GrowAlloc
+
+  mov     word [bx + HEAPITEM_SIG], 0
+  add     ax, SIZEOF_HEAPITEM
 
   mov     [si + HEAPITEM_SIZE], cx
   jmp     .ProcessGap
- .SkipGrowPtr:
 
   ; Fallback to alloc/copy/free
  .GrowAlloc:
@@ -165,6 +167,7 @@ resize:
   lea     ax, [ptr]
   push    ax
   call    free
+  jmp     .Exit
 
   ; Merge or absorb gap
  .ProcessGap:
