@@ -122,7 +122,7 @@ resize:
   add     di, si
   add     di, SIZEOF_HEAPITEM
 
-  ; Shrink ptr
+  ; Shrink pointer in place
   cmp     cx, [si + HEAPITEM_SIZE]
   jae     .SkipShrinkPtr
   mov     dx, [si + HEAPITEM_SIZE]
@@ -130,11 +130,14 @@ resize:
   jmp     .ProcessGap
  .SkipShrinkPtr:
 
-  ; Grow ptr
+  ; Grow pointer into next free block, if available
+ .GrowPtr:
   cmp     bx, heapData
   jb      .Exit ; .GrowAlloc?
   cmp     bx, heapDataEnd
-  jae     .Exit ; .GrowAlloc?
+  ja      .Exit ; .GrowAlloc?
+  mov     dx, cx      ; ?
+  je      .ProcessGap ; ?
 
   mov     dx, [si + HEAPITEM_SIZE]
   add     dx, [bx + HEAPITEM_SIZE]
@@ -145,7 +148,7 @@ resize:
   jne     .GrowAlloc
 
   mov     word [bx + HEAPITEM_SIG], 0
-  add     ax, SIZEOF_HEAPITEM
+  add     dx, SIZEOF_HEAPITEM
 
   mov     [si + HEAPITEM_SIZE], cx
   jmp     .ProcessGap
@@ -181,13 +184,16 @@ resize:
   add     [si + HEAPITEM_SIZE], ax
   jmp     .Exit
 
-  ; TODO: Merge gap with next free block
+  ; Merge gap with next free block
  .MergeGap:
   ; Validate nextPtr
   cmp     di, heapData
-  jb      .Exit
+  jb      .AbsorbGap ; .Exit?
   cmp     di, heapDataEnd
-  jae     .Exit
+  jae     .AbsorbGap ; .Exit?
+
+  mov     word [di + HEAPITEM_SIG], SIG_FREEBLOCK
+  add     word [di + HEAPITEM_SIZE], ALLOC_MINSIZE - SIZEOF_HEAPITEM
 
   ; Clean up and exit
  .Exit:
