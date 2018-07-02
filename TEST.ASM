@@ -33,16 +33,19 @@ run:
   push    word heapData + SIZEOF_HEAPITEM
   push    2048
   call    resize
+call checkHeap
 
   ; Test case: Delegate alloc
   push    word 0
   push    4096
   call    resize
+call checkHeap
 
   ; Test case: Release ptr
   push    ax
   push    word 0
   call    resize
+call checkHeap
 
   ; Test case: Shrink ptr
   push    4096
@@ -51,9 +54,11 @@ run:
   push    2048
   call    resize
   mov     [ptr1], ax
+call checkHeap
 
   push    word ptr1
   call    free
+call checkHeap
 
   mov     ax, 0x4C00
   int     0x21
@@ -202,6 +207,17 @@ resize:
   mov     sp, bp
   pop     bp
   ret 4
+
+;
+; func checkHeap( string testCase )
+;
+checkHeap:
+  push    bp
+  mov     bp, sp
+
+  mov     sp, bp
+  pop     bp
+  ret 2
 
 ;
 ; func @ alloc( uint size )
