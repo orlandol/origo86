@@ -60,10 +60,45 @@ call checkHeap
   call    free
 call checkHeap
 
+  ; Test case: Grow ptr in place
+  push    2048
+  call    alloc
+  mov     [ptr1], ax
+  push    4196
+  call    alloc
+  mov     [ptr2], ax
+  push    2048
+  call    alloc
+  mov     [ptr3], ax
+  push    ptr2
+  call    free
+  push    word [ptr1]
+  push    word 3072
+  call    resize
+call checkHeap
+
+  ; Test case: Delegate grow to alloc
+  push    word [ptr1]
+  push    word 8192
+  call    resize
+call checkHeap
+
+  push    ptr1
+  call    free
+  push    ptr2
+  call    free
+  push    ptr3
+  call    free
+
+call checkLeak
+
   mov     ax, 0x4C00
   int     0x21
 
 ptr1: dw 0
+ptr2: dw 0
+ptr3: dw 0
+ptr4: dw 0
 
 ;
 ; func resize( &ptr, uint newSize )
@@ -218,6 +253,17 @@ checkHeap:
   mov     sp, bp
   pop     bp
   ret 2
+
+;
+; func checkLeak()
+;
+checkLeak:
+  push    bp
+  mov     bp, sp
+
+  mov     sp, bp
+  pop     bp
+  ret
 
 ;
 ; func @ alloc( uint size )
