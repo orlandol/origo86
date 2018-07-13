@@ -156,7 +156,15 @@ Expected:
   push    bp
   mov     bp, sp
 
-  push    expectedString
+  push    expectedString1
+  call    echostring
+  push    word [curLine]
+  call    echouint
+  push    expectedString2
+  call    echostring
+  push    word [curCol]
+  call    echouint
+  push    expectedString3
   call    echostring
   push    word [bp + 4]
   call    echostring
@@ -195,6 +203,12 @@ Error:
 ; func Compile()
 ;
 Compile:
+  cmp     word [curToken], rsvdProgram
+  je      .ValidateSource
+  push    strProgram
+  call    Expected
+
+ .ValidateSource:
   ret
 
 %include "parse.inc"
@@ -204,7 +218,9 @@ bannerString:     db 'Origo Alpha',0
 copyrightString:  db 'Copyright 2016 - 2018 Orlando Llanes',0
 usageString:      db 'usage: origo source.ret',0
 
-expectedString:   db 'Expected: ', 0
+expectedString1:  db 'Expected[',0
+expectedString2:  db ',',0
+expectedString3:  db ']: ',0
 errorString:      db 'Error: ', 0
 
 lineStr: db 'line: ', 0

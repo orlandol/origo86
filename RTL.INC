@@ -4,106 +4,30 @@
 ;  2K - Stack
 
 ;
-; func @ alloc( uint size )
+; func dump()
 ;
-alloc:
-  push    bp
-  mov     bp, sp
-  %define size bp + 4
-  %define result bp - 2
-  push    word 0
+dump:
+  mov     ax, 0x4C01
+  int     0x21
+  ret
 
-  mov     cx, [size]
-  test    cx, cx
-  jz      .Exit
-
-  xor     bx, bx
-  mov     si, heapData
-  mov     dx, 0xFFFF
-
- .FindBestFit:
-  cmp     si, heapDataEnd
-  jae     .DoneBestFit
-  cmp     word [si + HEAPITEM_SIG], SIG_FREEBLOCK
-  jne     .NextBestFit
-  mov     ax, [si + HEAPITEM_SIZE]
-  cmp     cx, ax
-  ja      .NextBestFit
-  cmp     ax, dx
-  jae     .NextBestFit
-  mov     bx, si
-  mov     dx, ax
- .NextBestFit:
-  add     si, [si + HEAPITEM_SIZE]
-  add     si, SIZEOF_HEAPITEM
-  jmp     .FindBestFit
- .DoneBestFit:
-
-  test    bx, bx
-  jz      .Exit
-
-  mov     ax, dx
-  sub     ax, cx
-  cmp     ax, ALLOC_MINSIZE
-  ja      .NoGap
-  add     cx, ax
- .NoGap:
-
-  cmp     cx, dx
-  je      .NoSplit
-  lea     di, [bx + SIZEOF_HEAPITEM]
-  add     di, cx
-  sub     dx, cx
-  sub     dx, SIZEOF_HEAPITEM
-  mov     word [di + HEAPITEM_SIG], SIG_FREEBLOCK
-  mov     [di + HEAPITEM_SIZE], dx
- .NoSplit:
-
-  mov     word [bx + HEAPITEM_SIG], SIG_USEDBLOCK
-  mov     [bx + HEAPITEM_SIZE], cx
-
-  add     bx, SIZEOF_HEAPITEM
-  mov     [result], bx
-
- .Exit:
-  mov     ax, [result]
-
-  mov     sp, bp
-  pop     bp
+;
+; func char[4] dumphex16( uint16 value )
+;
+dumphex16:
   ret 2
 
 ;
-; func free( &ptr )
-;
-free:
-  push    bp
-  mov     bp, sp
-
-  mov     bx, [bp + 4]
-  test    bx, bx
-  jz      .Exit
-  mov     di, [bx]
-  test    di, di
-  jz      .Exit
-
- .Exit:
-  mov     sp, bp
-  pop     bp
+; func char[5] dumpuint16( uint16 value )
+dumpuint16:
   ret 2
 
-;
-; func @ realloc( @ pointer, uint size )
-;
-realloc:
-  push    bp
-  mov     bp, sp
-
-  mov     ax, [bp + 4]
-
- .Exit:
-  mov     sp, bp
-  pop     bp
-  ret 2
+dumpLine1: db '  --  Registers --------------------------',13,10,
+dumpLine2: db '  ax = 0x0000 (00000)  bx = 0x0000 (00000)',13,10,
+dumpLine3: db '  cx = 0x0000 (00000)  dx = 0x0000 (00000)',13,10,
+dumpLine4: db '  si = 0x0000 (00000)  di = 0x0000 (00000)',13,10,
+dumpLine5: db '  bp = 0x0000 (00000)  sp = 0x0000 (00000)',13,10,
+dumpLine6: db '  ----------------------------------------',13,10,'$'
 
 ;
 ; func int compare( string left, string right )

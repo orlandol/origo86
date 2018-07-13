@@ -475,6 +475,7 @@ GetToken:
   test    cl, chDigit
   jz      .NotNumber
   call    GetNumber
+  mov     [nextToken], ax
   jmp     .Exit
  .NotNumber:
 
@@ -482,6 +483,7 @@ GetToken:
   test    cl, chIdent
   jz      .NotIdent
   call    GetKeyword
+  mov     [nextToken], ax
   jmp     .Exit
  .NotIdent:
 
@@ -492,10 +494,12 @@ GetToken:
   jne     .NotString
  .IsString:
   call    GetString
+  mov     [nextToken], ax
   jmp     .Exit
  .NotString:
 
   call    GetOper
+  mov     [nextToken], ax
 
  .Exit:
   mov     sp, bp

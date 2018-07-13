@@ -33,19 +33,22 @@ run:
   push    word heapData + SIZEOF_HEAPITEM
   push    2048
   call    resize
-call checkHeap
+;push strTest1
+;call checkHeap
 
   ; Test case: Delegate alloc
   push    word 0
   push    4096
   call    resize
-call checkHeap
+;push strTest2
+;call checkHeap
 
   ; Test case: Release ptr
   push    ax
   push    word 0
   call    resize
-call checkHeap
+;push strTest3
+;call checkHeap
 
   ; Test case: Shrink ptr
   push    4096
@@ -54,11 +57,13 @@ call checkHeap
   push    2048
   call    resize
   mov     [ptr1], ax
-call checkHeap
+;push strTest3
+;call checkHeap
 
   push    word ptr1
   call    free
-call checkHeap
+;push strTest4
+;call checkHeap
 
   ; Test case: Grow ptr in place
   push    2048
@@ -72,16 +77,18 @@ call checkHeap
   mov     [ptr3], ax
   push    ptr2
   call    free
-  push    word [ptr1]
-  push    word 3072
-  call    resize
-call checkHeap
+;  push    word [ptr1]
+;  push    word 3072
+;  call    resize
+;push strTest5
+;call checkHeap
 
   ; Test case: Delegate grow to alloc
-  push    word [ptr1]
-  push    word 8192
-  call    resize
-call checkHeap
+;  push    word [ptr1]
+;  push    word 8192
+;  call    resize
+;push strTest6
+;call checkHeap
 
   push    ptr1
   call    free
@@ -90,7 +97,7 @@ call checkHeap
   push    ptr3
   call    free
 
-call checkLeak
+;call checkLeak
 
   mov     ax, 0x4C00
   int     0x21
@@ -99,6 +106,15 @@ ptr1: dw 0
 ptr2: dw 0
 ptr3: dw 0
 ptr4: dw 0
+
+strTest1: db 'Test Case 1: $'
+strTest2: db 'Test Case 2: $'
+strTest3: db 'Test Case 3: $'
+strTest4: db 'Test Case 4: $'
+strTest5: db 'Test Case 5: $'
+strTest6: db 'Test Case 6: $'
+strPassed: db 'Passed',13,10,'$'
+strFailed: db 'Failed',13,10,'$'
 
 ;
 ; func resize( &ptr, uint newSize )
