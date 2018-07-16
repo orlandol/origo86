@@ -9,6 +9,10 @@ run:
   push    bp
   mov     bp, sp
 
+nop
+call dump
+nop
+
   call    ParseOptions
 
   call    OpenRet

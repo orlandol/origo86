@@ -7,19 +7,114 @@
 ; func dump()
 ;
 dump:
+  push    sp
+  push    bp
+  push    di
+  push    si
+  push    dx
+  push    cx
+  push    bx
+  push    ax
+
+  ; int(ax)
+  push    word (dumpLine2 +  9)
+  push    ax
+  call    dumphex16
+
+  pop     ax
+  push    word (dumpLine2 + 19)
+  push    ax
+  call    dumpu16
+
+  ; int(bx)
+  push    word (dumpLine2 + 31)
+  push    ax
+  call    dumphex16
+
+  pop     ax
+  push    word (dumpLine2 + 40)
+  push    ax
+  call    dumpu16
+
+  ; int(cx)
+  push    word (dumpLine2 + 19)
+  push    ax
+  call    dumpu16
+
+  ; int(dx)
+  push    word (dumpLine2 + 19)
+  push    ax
+  call    dumpu16
+
+  ; int(si)
+  push    word (dumpLine2 + 19)
+  push    ax
+  call    dumpu16
+
+  ; int(di)
+  push    word (dumpLine2 + 19)
+  push    ax
+  call    dumpu16
+
+  ; int(bp)
+  push    word (dumpLine2 + 19)
+  push    ax
+  call    dumpu16
+
+  ; int(sp)
+  push    word (dumpLine2 + 19)
+  push    ax
+  call    dumpu16
+
+  ; Print formatted text
+  mov     dx, dumpLine1
+  mov     ah, 9
+  int     0x21
+
   mov     ax, 0x4C01
   int     0x21
   ret
 
 ;
-; func char[4] dumphex16( uint16 value )
+; func dumphex16( char[4] dest, uint16 value )
 ;
 dumphex16:
-  ret 2
+  %define dest + 6
+  %define value + 4
+
+  ret 4
 
 ;
-; func char[5] dumpuint16( uint16 value )
-dumpuint16:
+; func dumpu16( char[5] dest, uint16 value )
+;
+dumpu16:
+  push    bp
+  mov     bp, sp
+
+  %define dest  bp + 6
+  %define value bp + 4
+
+  mov     ax, [value]
+  xor     dx, dx
+  mov     di, [dest]
+  mov     bx, 10
+  test    di, di
+  jz      .Exit
+
+  ; TODO: Modify loop to copy digits in reverse order to destination
+
+ .DigitLoop:
+  div     bx
+  add     dl, '0'
+  mov     [di], dl
+  dec     di
+  xor     dx, dx
+  test    ax, ax
+  jnz     .DigitLoop
+
+ .Exit:
+  mov     sp, bp
+  pop     bp
   ret 2
 
 dumpLine1: db '  --  Registers --------------------------',13,10,
@@ -389,9 +484,13 @@ fwrite:
   push    bp
   mov     bp, sp
 
-  mov     cx, [bp + 4]
-  mov     dx, [bp + 6]
-  mov     bx, [bp + 8]
+  %define handle bp + 8
+  %define src    bp + 6
+  %define size   bp + 4
+
+  mov     cx, [size]
+  mov     dx, [src]
+  mov     bx, [handle]
   xor     ax, ax
 
   test    cx, cx
