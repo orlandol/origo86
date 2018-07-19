@@ -263,7 +263,7 @@ GetKeyword:
   jae     .Exit
 
   push    bx
-  push    curIdent
+  push    nextIdent;curIdent?
   push    word [bx]
   call    comparenc
   pop     bx

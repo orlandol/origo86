@@ -9,10 +9,6 @@ run:
   push    bp
   mov     bp, sp
 
-nop
-call dump
-nop
-
   call    ParseOptions
 
   call    OpenRet
@@ -207,12 +203,20 @@ Error:
 ; func Compile()
 ;
 Compile:
+  ; program IDENT => PROGNAME
   cmp     word [curToken], rsvdProgram
-  je      .ValidateSource
+  je      .IsProgram
   push    strProgram
   call    Expected
+ .IsProgram:
+  call    GetToken
 
- .ValidateSource:
+  cmp     word [curToken], tkIdent
+  je      .IsProgramIdent
+  push    strIdentifier
+  call    Expected
+ .IsProgramIdent:
+
   ret
 
 %include "parse.inc"
@@ -226,6 +230,8 @@ expectedString1:  db 'Expected[',0
 expectedString2:  db ',',0
 expectedString3:  db ']: ',0
 errorString:      db 'Error: ', 0
+
+strIdentifier:    db 'identifier',0
 
 lineStr: db 'line: ', 0
 colStr:  db 'col:  ', 0
@@ -261,4 +267,5 @@ nextString: times (STRING_MAXLEN + 1) db 0
 %include "keywords.inc"
 %include "optable.inc"
 
+%include "debug.inc"
 %include "rtl.inc"
