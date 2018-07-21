@@ -219,8 +219,11 @@ Compile:
 
   ret
 
+%include "scan.inc"
 %include "parse.inc"
+%include "expr.inc"
 %include "codegen.inc"
+%include "symtab.inc"
 
 bannerString:     db 'Origo Alpha',0
 copyrightString:  db 'Copyright 2016 - 2018 Orlando Llanes',0
