@@ -18,7 +18,7 @@
 
   %define ALLOC_MINSIZE (SIZEOF_HEAPITEM + 2)
 
-  %define heapDataEnd (heapData + SIZE_HEAPDATA + SIZEOF_HEAPITEM)
+  %define heapDataEnd (heapData + SIZE_HEAPDATA)
 
   ; Origo declarations
   %define IDENT_MAXLEN    31

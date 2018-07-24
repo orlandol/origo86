@@ -171,7 +171,7 @@ Expected:
   push    eoln
   call    echostring
 
-  mov     ax, 0x4C01
+  mov     ax, 0x4C02
   int     0x21
 
   mov     sp, bp
@@ -185,7 +185,15 @@ Error:
   push    bp
   mov     bp, sp
 
-  push    errorString
+  push    errorString1
+  call    echostring
+  push    word [curLine]
+  call    echouint
+  push    errorString2
+  call    echostring
+  push    word [curCol]
+  call    echouint
+  push    errorString3
   call    echostring
   push    word [bp + 4]
   call    echostring
@@ -199,42 +207,28 @@ Error:
   pop     bp
   ret 2
 
-;
-; func Compile()
-;
-Compile:
-  ; program IDENT => PROGNAME
-  cmp     word [curToken], rsvdProgram
-  je      .IsProgram
-  push    strProgram
-  call    Expected
- .IsProgram:
-  call    GetToken
-
-  cmp     word [curToken], tkIdent
-  je      .IsProgramIdent
-  push    strIdentifier
-  call    Expected
- .IsProgramIdent:
-
-  ret
-
 %include "scan.inc"
 %include "parse.inc"
 %include "expr.inc"
 %include "codegen.inc"
 %include "symtab.inc"
 
-bannerString:     db 'Origo Alpha',0
+bannerString:     db 'Origo86 Alpha',0
 copyrightString:  db 'Copyright 2016 - 2018 Orlando Llanes',0
-usageString:      db 'usage: origo source.ret',0
+usageString:      db 'usage: origo86 source.ret',0
 
-expectedString1:  db 'Expected[',0
-expectedString2:  db ',',0
+expectedString1:  db 'Expected[L',0
+expectedString2:  db ',C',0
 expectedString3:  db ']: ',0
-errorString:      db 'Error: ', 0
+
+errorString1:     db 'Error[L', 0
+errorString2:     db ',C',0
+errorString3:     db ']: ',0
 
 strIdentifier:    db 'identifier',0
+strTopLevel:      db 'run',0
+strFuncStatement: db 'end'
+strStatement:     db '',0
 
 lineStr: db 'line: ', 0
 colStr:  db 'col:  ', 0
@@ -248,7 +242,7 @@ curCol:   dw 1
 nextLine: dw 1
 nextCol:  dw 1
 
-binaryName: db "out.com",0
+binaryName: db "program.com",0
 
 source: dw 0
 binary: dw 0

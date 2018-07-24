@@ -10,7 +10,7 @@ ReadChar:
   cmp     word [curCh], 10
   jne     .NotLF
   inc     word [line]
-  mov     word [col], 0
+  mov     word [col], 1
   mov     word [colInc], 0
  .NotLF:
 
@@ -469,7 +469,10 @@ GetToken:
 
   ; Check for EOF
   test    bl, bl
-  jz      .Exit
+  jnz     .NotEOF
+  mov     word [nextToken], tkEOF
+  jmp     .Exit
+ .NotEOF: 
 
   ; Check for number
   test    cl, chDigit
