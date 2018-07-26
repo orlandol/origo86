@@ -210,6 +210,7 @@ Error:
 %include "scan.inc"
 %include "parse.inc"
 %include "expr.inc"
+%include "emit.inc"
 %include "codegen.inc"
 %include "symtab.inc"
 
