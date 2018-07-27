@@ -189,19 +189,7 @@
   %define setXor  (setSymbol + prec15 + 15)
   %define setOr   (setSymbol + prec15 + 16)
 
-  ; x86 assembler reserved word tokens
-  %define x86Mov (x86Ident + 0)
-
-  ; x86 16-bit register tokens
-  %define x86RegAX (x86Reg16 + 0)
-  %define x86RegCX (x86Reg16 + 1)
-  %define x86RegDX (x86Reg16 + 2)
-  %define x86RegBX (x86Reg16 + 3)
-  %define x86RegSP (x86Reg16 + 4)
-  %define x86RegBP (x86Reg16 + 5)
-  %define x86RegSI (x86Reg16 + 6)
-  %define x86RegDI (x86Reg16 + 7)
-
+  ; x86 Instruction format byte offsets
   %define x86ifInstPrefix     0
   %define x86ifAddrSizePrefix 1
   %define x86ifOperSizePrefix 2
@@ -218,6 +206,21 @@
   %define x86ifImm1           13
   %define x86ifImm2           14
   %define x86ifImm3           15
+
+  ; x86 assembler reserved word tokens
+  ; TODO: Define instructions from least variations to most for table size
+  %define x86Int (x86Ident + 0)
+  %define x86Mov (x86Ident + 1)
+
+  ; x86 16-bit register tokens
+  %define x86RegAX (x86Reg16 + 0)
+  %define x86RegCX (x86Reg16 + 1)
+  %define x86RegDX (x86Reg16 + 2)
+  %define x86RegBX (x86Reg16 + 3)
+  %define x86RegSP (x86Reg16 + 4)
+  %define x86RegBP (x86Reg16 + 5)
+  %define x86RegSI (x86Reg16 + 6)
+  %define x86RegDI (x86Reg16 + 7)
 
 ;
 ; macro InitRTL
