@@ -7,7 +7,7 @@
                         Table of Contents
 
                         1) Introduction
-                        2) Symbol Reference
+                        2) Symbol Glossary
                         3) Program Structure
                         4) Module Structure
                         5) Type Specification
@@ -16,10 +16,11 @@
                         8) Method Declarations
                         9) Function Declarations
                        10) Operator Declarations
-                       11) General Statements
-                       12) Conditional Statements
-                       13) Loop Statements
-                       14) Assembler Statements
+                       11) Expression Operators by Precedence
+                       12) General Statements
+                       13) Conditional Statements
+                       14) Loop Statements
+                       15) Assembler Statements
                                       --
 
                           1) Introduction
@@ -334,7 +335,69 @@
   end
                                       --
 
-                       11) General Statements
+                       11) Expression Operators by Precedence
+
+  VAROPERAND '++' => Post-Increment
+  VAROPERAND '--' => Post Decrement
+
+  '++' VAROPERAND => Pre-Increment
+  '--' VAROPERAND => Pre-Decrement
+  '-' OPERAND => Neg
+  '!' OPERAND => Logical Not
+  '~' OPERAND => Bitwise Complement
+
+  OPERAND '*' OPERAND => Multiply
+  OPERAND '/' OPERAND => Divide
+  OPERAND '%' OPERAND => Modulus
+
+  OPERAND '+' OPERAND => Add
+  OPERAND '-' OPERAND => Sub
+
+  OPERAND '<<' OPERAND => Shift-Left
+  OPERAND '>>' OPERAND => Shift-Right
+  OPERAND '->>' OPERAND => Signed Shift-Right
+  OPERAND '<<<' OPERAND => Rotate Left
+  OPERAND '<<<-' OPERAND => Signed Rotate Left
+  OPERAND '>>>' OPERAND => Rotate Right
+  OPERAND '->>>' OPERAND => Signed Rotate Right
+
+  OPERAND '<' OPERAND => Less Than
+  OPERAND '<=' OPERAND => Less Than or Equal To
+  OPERAND '>' OPERAND => Greated Than
+  OPERAND '>=' OPERAND => Greater Than or Equal To
+
+  OPERAND '=' OPERAND => Equal To
+  OPERAND '!=' OPERAND => Not Equal To
+
+  OPERAND '&' OPERAND => Bitwise And
+
+  OPERAND '^' OPERAND => Bitwise Exclusive Or
+
+  OPERAND '|' OPERAND => Bitwise Or
+
+  OPERAND '&&' OPERAND => Logical And
+
+  OPERAND '||' OPERAND => Logical Or
+
+  RESULT '=' EXPRESSION => Assign result from expression
+  RESULT '+=' EXPRESSION => Add expression to the result
+  RESULT '-=' EXPRESSION => Subtract expression from the result
+  RESULT '*=' EXPRESSION => Multiply result by expression
+  RESULT '/=' EXPRESSION => Divide result by expression
+  RESULT '%=' EXPRESSION => Modulo result by expression
+  RESULT '<<=' EXPRESSION => Shift result Left by expression
+  RESULT '>>=' EXPRESSION => Shift result Right by expression
+  RESULT '->>=' EXPRESSION => Signed Shift result Right by expression
+  RESULT '<<<=' EXPRESSION => Rotate result Left by expression
+  RESULT '<<<-=' EXPRESSION => Signed Rotate result Left by expression
+  RESULT '>>>=' EXPRESSION => Rotate result Right by expression
+  RESULT '->>>=' EXPRESSION => Signed Rotate result Right by expression
+  RESULT '&=' EXPRESSION => Bitwise And result by expression
+  RESULT '^=' EXPRESSION => Bitwise Xor result by expression
+  RESULT '|=' EXPRESSION => Bitwise Or result by expression
+                                      --
+
+                       12) General Statements
 
   IDENT ':' => LABELNAME
 
@@ -351,7 +414,7 @@
   EXPRESSION
                                       --
 
-                       12) Conditional Statements
+                       13) Conditional Statements
 
   if CONDITION
     then STATEMENT
@@ -398,7 +461,7 @@
   endcase
                                       --
 
-                       13) Loop Statements
+                       14) Loop Statements
 
   [LABEL] while CONDITION
     < [STATEMENT] |
@@ -431,30 +494,30 @@
   [STATEMENT] until CONDITION
                                       --
 
-                       14) Assembler Statements
+                       15) Assembler Statements
 
                             x86 Instructions
 
-  adc           jb            lodsb         rcl           sti
-  add           jbe           lodsw         rcr           stos
-  and           ja            loop          rol           stosb
-  call          jae           loope         ror           stosw
-  cbw           je            loopne        rep           sub
-  clc           jne           loopz         repe          test
-  cld           jz            loopnz        repne         xchg
-  cli           jnz           mov           repz          xlat
-  cmc           jl            movs          repnz         xlatb
-  cmp           jle           movsb         ret           xor
-  cmps          jg            movsw         retf
-  cmpsb         jge           mul           sahf
-  cmpsw         jc            neg           sal
-  cwd           jnc           nop           sar
-  dec           jcxz          not           shl
-  div           jecxz         or            shr
-  idiv          jmp           out           sbb
-  imul          lahf          pop           scas
-  in            lds           popf          scasb
-  inc           les           push          scasw
-  int           lea           pushf         stc
-  iret          lods          rcl           std
+  adc           jb            lodsb         rcr           stos
+  add           jbe           lodsw         rol           stosb
+  and           ja            loop          ror           stosw
+  call          jae           loope         rep           sub
+  cbw           je            loopne        repe          test
+  clc           jne           loopz         repne         xchg
+  cld           jz            loopnz        repz          xlat
+  cli           jnz           mov           repnz         xlatb
+  cmc           jl            movs          ret           xor
+  cmp           jle           movsb         retf
+  cmps          jg            movsw         sahf
+  cmpsb         jge           mul           sal
+  cmpsw         jc            neg           sar
+  cwd           jnc           nop           shl
+  dec           jcxz          not           shr
+  div           jecxz         or            sbb
+  idiv          jmp           out           scas
+  imul          lahf          pop           scasb
+  in            lds           popf          scasw
+  inc           les           push          stc
+  int           lea           pushf         std
+  iret          lods          rcl           sti
                                       --
