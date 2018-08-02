@@ -498,26 +498,26 @@
 
                             x86 Instructions
 
-  adc           jb            lodsb         rcr           stos
-  add           jbe           lodsw         rol           stosb
-  and           ja            loop          ror           stosw
-  call          jae           loope         rep           sub
-  cbw           je            loopne        repe          test
-  clc           jne           loopz         repne         xchg
-  cld           jz            loopnz        repz          xlat
-  cli           jnz           mov           repnz         xlatb
-  cmc           jl            movs          ret           xor
-  cmp           jle           movsb         retf
-  cmps          jg            movsw         sahf
-  cmpsb         jge           mul           sal
-  cmpsw         jc            neg           sar
-  cwd           jnc           nop           shl
-  dec           jcxz          not           shr
-  div           jecxz         or            sbb
-  idiv          jmp           out           scas
-  imul          lahf          pop           scasb
-  in            lds           popf          scasw
-  inc           les           push          stc
-  int           lea           pushf         std
-  iret          lods          rcl           sti
+  adc           jb            lodsw         rol           stosb
+  add           jbe           loop          ror           stosw
+  and           ja            loope         rep           sub
+  call          jae           loopne        repe          test
+  cbw           je            loopz         repne         xchg
+  clc           jne           loopnz        repz          xlat
+  cld           jz            mov           repnz         xlatb
+  cli           jnz           movs          ret           xor
+  cmc           jl            movsb         retf
+  cmp           jle           movsw         sahf
+  cmps          jg            mul           sal
+  cmpsb         jge           neg           sar
+  cmpsw         jc            nop           shl
+  cwd           jnc           not           shr
+  dec           jcxz          or            sbb
+  div           jmp           out           scas
+  idiv          lahf          pop           scasb
+  imul          lds           popf          scasw
+  in            les           push          stc
+  inc           lea           pushf         std
+  int           lods          rcl           sti
+  iret          lodsb         rcr           stos
                                       --

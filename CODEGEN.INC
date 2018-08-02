@@ -11,6 +11,12 @@ x86GenOpReg:
   ret 4
 
 ;
+; func bool x86GenRepOpReg( uint repToken, uint opToken )
+;
+x86GenRepOpReg:
+  ret 4
+
+;
 ; func bool x86GenOpImm( uint opToken, uint imm )
 ;
 x86GenOpImm:
