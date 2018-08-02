@@ -17,10 +17,20 @@ x86GenOpImm:
   ret 4
 
 ;
-; func bool x86GenOpRegImm( uint opToken, uint destReg, uint imm )
+; func bool x86GenOpRegImm( uint opToken, uint destReg,
+;   uint immType, uint value )
 ;
 x86GenOpRegImm:
-  ret 6
+  push    bp
+  mov     bp, sp
+  %define opToken bp - 12
+  %define destReg bp - 10
+  %define immType bp - 8
+  %define value   bp - 6
+
+  mov     sp, bp
+  pop     bp
+  ret 8
 
 ;
 ; func bool x86GenOpRegMem( uint opToken, uint destReg, @x86MemRef mem )

@@ -48,6 +48,9 @@ Compile:
 ; func ParseRun()
 ;
 ParseRun:
+  push    bp
+  mov     bp, sp
+
   cmp     word [entryPoint], 0xFFFF
   je      .RunValid
   push    errDuplicateRun
@@ -58,7 +61,19 @@ ParseRun:
 
  .StatementLoop:
   cmp     word [curToken], rsvdEnd
-  je      .Done
+  jne     .NotEnd
+  ; mov ax, 0x4C00/int 0x21 in reverse order because of stack
+  push    word 0x0021
+  push    word 0xCD4C
+  push    word 0x00B8
+
+  push    word [binary]
+  lea     di, [bp - 6]
+  push    di
+  push    word 5
+  call    fwrite
+  jmp     .Done
+ .NotEnd:
 
   push    strFuncStatement
   call    Expected
@@ -67,6 +82,8 @@ ParseRun:
   call    GetToken
 
  .Exit:
+  mov     sp, bp
+  pop     bp
   ret
 
 entryPoint: dw 0xFFFF

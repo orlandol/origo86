@@ -1,5 +1,4 @@
 
   ORG 0x100
 
-  mov     ax, 0x4C00
-  int     0x21
+  db 0x80,      11_000_000b, 0x12
