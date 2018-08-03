@@ -19,6 +19,11 @@ Compile:
   call    DeclareNamespace
   call    GetToken
 
+  ; TODO: Generate COM initialization code
+
+  ; TODO: Save current offset as run backpatch
+  ; TODO: GenOpImm( x86Jmp, 0xFFFF ) => "jmp run"
+
   ; run, ...
  .ParseLoop:
   mov     ax, [curToken]
@@ -58,6 +63,8 @@ ParseRun:
  .RunValid:
   mov     word [entryPoint], 0 ; TODO: Replace 0 with codeOfs
   call    GetToken
+
+  ; TODO: Backpatch offset of initial "jmp run"
 
  .StatementLoop:
   cmp     word [curToken], rsvdEnd
