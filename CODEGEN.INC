@@ -17,14 +17,14 @@ x86GenRepOpReg:
   ret 4
 
 ;
-; func bool x86GenOpImm( uint opToken, uint imm )
+; func bool x86GenOpImm( uint opToken, uint immType, uint imm )
 ;
 x86GenOpImm:
-  ret 4
+  ret 6
 
 ;
 ; func bool x86GenOpRegImm( uint opToken, uint destReg,
-;   uint immType, uint value )
+;   uint immType, uint imm )
 ;
 x86GenOpRegImm:
   push    bp
@@ -33,7 +33,29 @@ x86GenOpRegImm:
   %define destReg bp - 10
   %define immType bp - 8
   %define value   bp - 6
+  push    word 0
+  push    word 0
+  push    word 0
+  push    word 0
 
+  lea     bx, [bp - 8]
+  xor     di, di
+
+  mov     dx, [destReg]
+  mov     cx, dx
+  and     dx, maskGroup
+
+  mov     ax, [opToken]
+  cmp     ax, x86Mov
+  jne     .NotMov
+ .NotMov:
+
+  xor     ax, ax
+  jmp     .Exit
+
+ .EmitInstruction:
+
+ .Exit:
   mov     sp, bp
   pop     bp
   ret 8

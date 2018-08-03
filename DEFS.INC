@@ -4,20 +4,6 @@
   %define SIZE_HEAPDATA (54 * 1024)
   %define SIZE_STACK     (2 * 1024)
 
-  %define SIZEOF_HEAPITEM 4
-  %define HEAPITEM_SIG    0
-  %define HEAPITEM_SIZE   2
-
-  %define SIZEOF_PTRHDR 4
-  %define PTRHDR_SIG    -4
-  %define PTRHDR_SIZE   -2
-
-  %define SIG_FREEBLOCK 0101010101010101b
-  %define SIG_USEDBLOCK 1010101010101010b
-  %define SIG_RSVDBLOCK 1101100110011011b
-
-  %define ALLOC_MINSIZE (SIZEOF_HEAPITEM + 2)
-
   %define heapDataEnd (heapData + SIZE_HEAPDATA)
 
   ; Origo declarations
@@ -356,8 +342,6 @@
   mov     cx, ((SIZE_HEAPDATA) / 2)
   xor     ax, ax
   rep stosw
-  mov     word [heapData + HEAPITEM_SIG],  SIG_FREEBLOCK
-  mov     word [heapData + HEAPITEM_SIZE], SIZE_HEAPDATA
 
   ; Initialize command-line arguments
   mov     bx, arg
