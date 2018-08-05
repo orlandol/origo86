@@ -23,37 +23,87 @@ x86GenOpImm:
   ret 6
 
 ;
-; func bool x86GenOpRegImm( uint opToken, uint destReg,
-;   uint immType, uint imm )
+; func bool x86GenOpRegImm( uint op, uint destReg, uint immType, uint imm )
 ;
 x86GenOpRegImm:
   push    bp
   mov     bp, sp
-  %define opToken bp - 12
-  %define destReg bp - 10
-  %define immType bp - 8
-  %define value   bp - 6
-  push    word 0
-  push    word 0
+  %define op          bp + 10
+  %define destReg     bp + 8
+  %define immType     bp + 6
+  %define imm         bp + 4
+  %define instruction bp - 4
   push    word 0
   push    word 0
 
-  lea     bx, [bp - 8]
-  xor     di, di
+  mov     bx, [op]
+  mov     si, [destReg]
+  mov     di, [immType]
+  mov     ax, [imm]
 
-  mov     dx, [destReg]
-  mov     cx, dx
-  and     dx, maskGroup
+  cmp     di, valInt8
+  jne     .NotUint8
+  cbw
+  jmp     .ImmInitialized
+ .NotUint8:
 
-  mov     ax, [opToken]
-  cmp     ax, x86Mov
+  cmp     di, valUint8
+  jne     .NotUint8
+  xor     ah, ah
+;  jmp     .ImmInitialized
+
+ .ImmInitialized:
+  mov     dx, ax
+
+  mov     ax, si
+  and     si, maskGroup
+  and     ax, maskSubToken
+
+  cmp     bx, x86Mov
   jne     .NotMov
+  add     ax, 0b1100_0110_11_000_000
  .NotMov:
+
+  cmp     si, x86Reg8
+  je      .Emit8
+
+  inc     al
+  cmp     si, x86Reg16
+  je      .Emit16
 
   xor     ax, ax
   jmp     .Exit
 
+ .Emit8:
+  lea     bx, [instruction]
+  mov     [bx + 0], ax
+  mov     [bx + 2], dl ; ?
+  mov     cx, 3
+  jmp     .EmitInstruction
+
+ .Emit16:
+  lea     bx, [instruction]
+  mov     [bx + 0], ax
+  mov     [bx + 2], dx
+  mov     cx, 4
+  jmp     .EmitInstruction
+
  .EmitInstruction:
+  ;add     [codeSize], cx
+  push    cx
+  push    word [binary]
+  push    bx
+  push    cx
+  call    fwrite
+  pop     cx
+
+  cmp     ax, cx
+  je      .Done
+  xor     ax, ax
+  jmp     .Exit
+ .Done:
+
+  mov     ax, 1
 
  .Exit:
   mov     sp, bp

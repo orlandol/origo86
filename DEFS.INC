@@ -121,9 +121,12 @@
   ; Literal value tokens
   %define valFalse  (valLiteral + 0)
   %define valTrue   (valLiteral + 1)
-  %define valUint   (valLiteral + 2)
-  %define valString (valLiteral + 3)
-  %define valChar   (valLiteral + 4)
+  %define valInt    (valLiteral + 2)
+  %define valInt8   (valLiteral + 3)
+  %define valUint   (valLiteral + 4)
+  %define valUint8  (valLiteral + 5)
+  %define valString (valLiteral + 6)
+  %define valChar   (valLiteral + 7)
 
   ; Operator tokens
   %define opPostInc  (operSymbol + prec01 + 0)
