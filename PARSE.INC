@@ -69,15 +69,24 @@ ParseRun:
  .StatementLoop:
   cmp     word [curToken], rsvdEnd
   jne     .NotEnd
+
+  push    word x86Mov
+  push    word x86RegAX
+  push    word valUint
+  push    word 0x4C00
+  call    x86GenOpRegImm
+
   ; mov ax, 0x4C00/int 0x21 in reverse order because of stack
   push    word 0x0021
   push    word 0xCD4C
   push    word 0x00B8
 
   push    word [binary]
-  lea     di, [bp - 6]
+;  lea     di, [bp - 6]
+  lea     di, [bp - 3]
   push    di
-  push    word 5
+;  push    word 5
+  push    word 2
   call    fwrite
   jmp     .Done
  .NotEnd:

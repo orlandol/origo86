@@ -28,10 +28,12 @@ x86GenOpImm:
 x86GenOpRegImm:
   push    bp
   mov     bp, sp
+
   %define op          bp + 10
   %define destReg     bp + 8
   %define immType     bp + 6
   %define imm         bp + 4
+
   %define instruction bp - 4
   push    word 0
   push    word 0
@@ -48,11 +50,12 @@ x86GenOpRegImm:
  .NotUint8:
 
   cmp     di, valUint8
-  jne     .NotUint8
+  jne     .NotInt8
   xor     ah, ah
-;  jmp     .ImmInitialized
+ .NotInt8:
 
  .ImmInitialized:
+
   mov     dx, ax
 
   mov     ax, si
@@ -61,13 +64,13 @@ x86GenOpRegImm:
 
   cmp     bx, x86Mov
   jne     .NotMov
-  add     ax, 0b1100_0110_11_000_000
+  add     ax, 0b11_000_000__1100_0110 ; ModR/M:Opcode => Opcode, ModR/M
  .NotMov:
 
   cmp     si, x86Reg8
   je      .Emit8
 
-  inc     al
+  inc     al ; Opcode => 0b1100_0111
   cmp     si, x86Reg16
   je      .Emit16
 
@@ -77,7 +80,7 @@ x86GenOpRegImm:
  .Emit8:
   lea     bx, [instruction]
   mov     [bx + 0], ax
-  mov     [bx + 2], dl ; ?
+  mov     [bx + 2], dl
   mov     cx, 3
   jmp     .EmitInstruction
 
@@ -90,6 +93,7 @@ x86GenOpRegImm:
 
  .EmitInstruction:
   ;add     [codeSize], cx
+
   push    cx
   push    word [binary]
   push    bx

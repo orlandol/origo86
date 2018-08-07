@@ -1,7 +1,3 @@
-%macro break 0
-  db 0xCC
-%endmacro
-
 ;
 ; func dump()
 ;

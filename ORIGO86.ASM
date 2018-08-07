@@ -84,6 +84,14 @@ OpenRet:
   call    fopen
   mov     [source], ax
 
+  test    ax, ax
+  jnz     .IsOpen
+  push    errorSourceFile
+  call    echostring
+  mov     ax, 0x4C00
+  int     0x21
+ .IsOpen:
+
   ; Read character and lookahead character
   call    ReadChar
   call    ReadChar
@@ -207,6 +215,8 @@ Error:
 bannerString:     db 'Origo86 Alpha',0
 copyrightString:  db 'Copyright 2016 - 2018 Orlando Llanes',0
 usageString:      db 'usage: origo86 source.ret',0
+
+errorSourceFile:  db 'Unable to open source file',13,10,0
 
 expectedString1:  db 'Expected[L',0
 expectedString2:  db ',C',0
