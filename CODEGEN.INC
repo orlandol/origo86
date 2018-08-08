@@ -20,6 +20,58 @@ x86GenRepOpReg:
 ; func bool x86GenOpImm( uint opToken, uint immType, uint imm )
 ;
 x86GenOpImm:
+  push    bp
+  mov     bp, sp
+
+  %define op          bp + 8
+  %define immType     bp + 6
+  %define imm         bp + 4
+
+  %define instruction bp - 4
+  push    word 0
+  push    word 0
+
+  mov     bx, [op]
+  mov     di, [immType]
+  mov     dx, [imm]
+
+  cmp     bx, x86Int
+  jne     .NotX86Int
+  mov     al, 0b1100_1101
+  jmp     .Emit8
+ .NotX86Int:
+
+  xor     ax, ax
+  jmp     .Exit
+
+ .Emit8:
+  lea     bx, [instruction]
+  mov     [bx + 0], al
+  mov     [bx + 1], dl
+  mov     cx, 2
+  ;jmp     .EmitInstruction
+
+ .EmitInstruction:
+  ;add     [codeSize], cx
+
+  push    cx
+  push    word [binary]
+  push    bx
+  push    cx
+  call    fwrite
+  pop     cx
+
+  cmp     ax, cx
+  je      .Done
+  xor     ax, ax
+  jmp     .Exit
+ .Done:
+
+  mov     ax, 1
+
+ .Exit:
+  mov     sp, bp
+  pop     bp
   ret 6
 
 ;
@@ -89,7 +141,7 @@ x86GenOpRegImm:
   mov     [bx + 0], ax
   mov     [bx + 2], dx
   mov     cx, 4
-  jmp     .EmitInstruction
+  ;jmp     .EmitInstruction
 
  .EmitInstruction:
   ;add     [codeSize], cx

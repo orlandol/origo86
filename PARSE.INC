@@ -76,18 +76,21 @@ ParseRun:
   push    word 0x4C00
   call    x86GenOpRegImm
 
-  ; mov ax, 0x4C00/int 0x21 in reverse order because of stack
-  push    word 0x0021
-  push    word 0xCD4C
-  push    word 0x00B8
+  push    word x86Int
+  push    word valUint8
+  push    word 0x21
+  call    x86GenOpImm
 
-  push    word [binary]
+  ; mov ax, 0x4C00/int 0x21 in reverse order because of stack
+;  push    word 0x0021
+;  push    word 0xCD4C
+;  push    word 0x00B8
+
+;  push    word [binary]
 ;  lea     di, [bp - 6]
-  lea     di, [bp - 3]
-  push    di
+;  push    di
 ;  push    word 5
-  push    word 2
-  call    fwrite
+;  call    fwrite
   jmp     .Done
  .NotEnd:
 
