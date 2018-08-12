@@ -1,23 +1,81 @@
 ;
-; func bool x86GenOp( uint opToken )
+; func bool x86GenOp( uint op )
 ;
 x86GenOp:
+  push    bp
+  mov     bp, sp
+
+  %define op bp + 4
+
+  %define instruction bp - 2
+  push    word 0
+
+  mov     si, [op]
+  mov     dx, si
+  and     si, maskSubToken
+  and     dx, maskGroup
+
+  xor     ax, ax
+
+  cmp     dx, x86Ident
+  jne     .Exit
+
+  cmp     si, 16
+  ja      .Exit
+
+  mov     al, [si + x86SingleByteOpTable]
+
+  lea     bx, [instruction]
+
+  mov     [bx + 0], al
+
+  push    word [binary]
+  push    bx
+  push    word 1
+  call    fwrite
+
+  cmp     ax, 1
+  je      .Exit
+  xor     ax, ax
+
+ .Exit:
+  mov     sp, bp
+  pop     bp
   ret 2
 
+x86SingleByteOpTable:
+  db 0b1001_1000 ; x86Cbw
+  db 0b1111_1000 ; x86Clc
+  db 0b1111_1100 ; x86Cld
+  db 0b1111_1010 ; x86Cli
+  db 0b1111_0101 ; x86Cmc
+  db 0b1100_1100 ; x86Int3
+  db 0b1100_1111 ; x86Iret
+  db 0b1001_1111 ; x86Lahf
+  db 0b1001_0000 ; x86Nop
+  db 0b1100_0011 ; x86Ret
+  db 0b1100_1011 ; x86Retf
+  db 0b1001_1110 ; x86Sahf
+  db 0b1111_1001 ; x86Stc
+  db 0b1111_1101 ; x86Std
+  db 0b1111_1011 ; x86Sti
+  db 0b1101_0111 ; x86Xlat
+  db 0b1101_0111 ; x86Xlatb
+
 ;
-; func bool x86GenOpReg( uint opToken, uint reg )
+; func bool x86GenOpReg( uint op, uint reg )
 ;
 x86GenOpReg:
   ret 4
 
 ;
-; func bool x86GenRepOpReg( uint repToken, uint opToken )
+; func bool x86GenRepOpReg( uint repToken, uint op )
 ;
 x86GenRepOpReg:
   ret 4
 
 ;
-; func bool x86GenOpImm( uint opToken, uint immType, uint imm )
+; func bool x86GenOpImm( uint op, uint immType, uint imm )
 ;
 x86GenOpImm:
   push    bp
@@ -167,13 +225,13 @@ x86GenOpRegImm:
   ret 8
 
 ;
-; func bool x86GenOpRegMem( uint opToken, uint destReg, @x86MemRef mem )
+; func bool x86GenOpRegMem( uint op, uint destReg, @x86MemRef mem )
 ;
 x86GenOpRegMem:
   ret 6
 
 ;
-; func bool x86GenOpRegReg( uint opToken, uint destReg, uint srcReg )
+; func bool x86GenOpRegReg( uint op, uint destReg, uint srcReg )
 ;
 x86GenOpRegReg:
   ret 6
