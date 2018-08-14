@@ -20,7 +20,7 @@ x86GenOp:
   cmp     dx, x86Ident
   jne     .Exit
 
-  cmp     si, 16
+  cmp     si, 17
   ja      .Exit
 
   mov     al, [si + x86SingleByteOpTable]
@@ -45,6 +45,7 @@ x86GenOp:
 
 x86SingleByteOpTable:
   db 0b1001_1000 ; x86Cbw
+  db 0b1001_1001 ; x86Cwd
   db 0b1111_1000 ; x86Clc
   db 0b1111_1100 ; x86Cld
   db 0b1111_1010 ; x86Cli
