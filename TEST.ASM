@@ -3,5 +3,6 @@
 
   int 0x20
 
-  xlat
-  xlatb
+  xchg cl, [foo]
+  xchg bx, [foo]
+ foo:
