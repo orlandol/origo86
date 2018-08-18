@@ -111,8 +111,6 @@ x86GenOpImm:
   ;jmp     .EmitInstruction
 
  .EmitInstruction:
-  ;add     [codeSize], cx
-
   push    cx
   push    word [binary]
   push    bx
@@ -175,7 +173,8 @@ x86GenOpRegImm:
 
   cmp     bx, x86Mov
   jne     .NotMov
-  add     ax, 0b11_000_000__1100_0110 ; ModR/M:Opcode => Opcode, ModR/M
+  add     ah, 0b11_000_000 ; ModReg
+  mov     al, 0b1100_0110 ; Opcode
  .NotMov:
 
   cmp     si, x86Reg8
@@ -203,8 +202,6 @@ x86GenOpRegImm:
   ;jmp     .EmitInstruction
 
  .EmitInstruction:
-  ;add     [codeSize], cx
-
   push    cx
   push    word [binary]
   push    bx
@@ -235,5 +232,71 @@ x86GenOpRegMem:
 ; func bool x86GenOpRegReg( uint op, uint destReg, uint srcReg )
 ;
 x86GenOpRegReg:
-  ret 6
+  push    bp
+  mov     bp, sp
 
+  %define op          bp + 8
+  %define destReg     bp + 6
+  %define srcReg      bp + 4
+
+  %define instruction bp - 2
+  push    word 0
+
+  mov     bx, [op]
+  xor     ax, ax
+
+  mov     cx, [destReg]
+  mov     si, cx
+  and     cx, maskSubToken
+  and     si, maskGroup
+
+  mov     dx, [srcReg]
+  mov     di, dx
+  and     dx, maskSubToken
+  and     di, maskGroup
+
+  cmp     si, di
+  jne     .Exit
+  shl     dl, 3
+  or      cl, dl
+
+  cmp     bx, x86Adc
+  jne     .NotAdc
+  mov     al, 0b0001_0000
+  mov     ah, cl
+  or      ah, 0b11_000_000
+  cmp     si, x86Reg8
+  je      .Emit
+  inc     al
+  cmp     di, x86Reg16
+  je      .Emit
+ .NotAdc:
+
+  xor     ax, ax
+  jmp     .Exit
+
+ .Emit:
+  lea     bx, [instruction]
+  mov     [bx + 0], ax
+  mov     cx, 2
+
+ .EmitInstruction:
+  push    cx
+  push    word [binary]
+  push    bx
+  push    cx
+  call    fwrite
+  pop     cx
+
+  cmp     ax, cx
+  je      .Done
+  xor     ax, ax
+  jmp     .Exit
+ .Done:
+
+  mov     ax, 1
+
+ .Exit:
+  mov     sp, bp
+  pop     bp
+  ret 6

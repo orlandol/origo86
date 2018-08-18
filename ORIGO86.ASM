@@ -16,6 +16,16 @@ run:
 
   call    Compile
 
+push x86Adc
+push x86RegBL
+push x86RegCL
+call x86GenOpRegReg
+
+push x86Adc
+push x86RegBX
+push x86RegCX
+call x86GenOpRegReg
+
   call    Cleanup
 
   mov     sp, bp
