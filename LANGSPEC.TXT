@@ -524,501 +524,525 @@
 
                         16) x86 16-Bit ModR/M Format
 
-This section based on Table 2-1 16-Bit Addressing Forms with the ModR/M Byte
-  from the Intel 64 and IA-32 Architectures Software Developer's Manual
-
-         SS is the default segment register when BP is used as an index
-
-                 ModR/M = | 2-bit MOD | 3-bit REG | 3-bit RM ]
-
---------------------------------------------------------------------------------------
-Opcode extension encodings for /0 .. /7
---------------------------------------------------------------------------------------
-/0                  => MOD_000_RM
-/1                  => MOD_001_RM
-/2                  => MOD_010_RM
-/3                  => MOD_011_RM
-/4                  => MOD_100_RM
-/5                  => MOD_101_RM
-/6                  => MOD_110_RM
-/7                  => MOD_111_RM
-
---------------------------------------------------------------------------------------
-/r for 8-bit registers
---------------------------------------------------------------------------------------
-AL                  => MOD_000_RM
-CL                  => MOD_001_RM
-DL                  => MOD_010_RM
-BL                  => MOD_011_RM
-AH                  => MOD_100_RM
-CH                  => MOD_101_RM
-DH                  => MOD_110_RM
-BH                  => MOD_111_RM
-
---------------------------------------------------------------------------------------
-/r for 16-bit registers
---------------------------------------------------------------------------------------
-AX                  => MOD_000_RM
-CX                  => MOD_001_RM
-DX                  => MOD_010_RM
-BX                  => MOD_011_RM
-SP                  => MOD_100_RM
-BP                  => MOD_101_RM
-SI                  => MOD_110_RM
-DI                  => MOD_111_RM
-
---------------------------------------------------------------------------------------
-MOD 00
---------------------------------------------------------------------------------------
-[BX + SI]           => 00_REG_000
-[BX + DI]           => 00_REG_001
-[BP + SI]           => 00_REG_010
-[BP + DI]           => 00_REG_011
-[SI]                => 00_REG_100
-[DI]                => 00_REG_101
-DISP16              => 00_REG_110
-[BX]                => 00_REG_111
-
-- DISP16 is an index within the default, or specified, segment
-
---------------------------------------------------------------------------------------
-MOD 01
---------------------------------------------------------------------------------------
-[BX + SI] + DISP8   => 01_REG_000
-[BX + DI] + DISP8   => 01_REG_001
-[BP + SI] + DISP8   => 01_REG_010
-[BP + DI] + DISP8   => 01_REG_011
-[SI] + DISP8        => 01_REG_100
-[DI] + DISP8        => 01_REG_101
-[BP] + DISP8        => 01_REG_110
-[BX] + DISP8        => 01_REG_111
-
-- DISP8 is sign extended (for all of MOD 01?)
-
---------------------------------------------------------------------------------------
-MOD 10
---------------------------------------------------------------------------------------
-[BX + SI] + DISP16  => 10_REG_000
-[BX + DI] + DISP16  => 10_REG_001
-[BP + SI] + DISP16  => 10_REG_010
-[BP + DI] + DISP16  => 10_REG_011
-[SI] + DISP16       => 10_REG_100
-[DI] + DISP16       => 10_REG_101
-[BP] + DISP16       => 10_REG_110
-[BX] + DISP16       => 10_REG_111
-
---------------------------------------------------------------------------------------
-MOD 11 for 8-Bit Registers
---------------------------------------------------------------------------------------
-AL                  => 11_REG_000
-CL                  => 11_REG_001
-DL                  => 11_REG_010
-BL                  => 11_REG_011
-AH                  => 11_REG_100
-CH                  => 11_REG_101
-DH                  => 11_REG_110
-BH                  => 11_REG_111
-
---------------------------------------------------------------------------------------
-MOD 11 for 16-Bit Registers
---------------------------------------------------------------------------------------
-AX                  => 11_REG_000
-CX                  => 11_REG_001
-DX                  => 11_REG_010
-BX                  => 11_REG_011
-SP                  => 11_REG_100
-BP                  => 11_REG_101
-SI                  => 11_REG_110
-DI                  => 11_REG_111
-                                      --
-
-                17) x86 Instruction Encodings for x86GenXYZ
-
-Instruction encodings based on Section B.2 General-Purpose Instruction Formats
-  and Encodings For Non-64-Bit Modes.
-
-                              [ ] = Untested
-                              [*] = Tested
-
---------------------------------------------------------------------------------------
-x86GenOp
---------------------------------------------------------------------------------------
-[*] cbw                        => 1001_1000
-[*] cwd                        => 1001_1001
-[*] clc                        => 1111_1000
-[*] cld                        => 1111_1100
-[*] cli                        => 1111_1010
-[*] cmc                        => 1111_0101
-[*] int3                       => 1100_1100
-[*] iret                       => 1100_1111
-[*] lahf                       => 1001_1111
-[*] nop                        => 1001_0000
-[*] ret                        => 1100_0011
-[*] retf                       => 1100_1011
-[*] sahf                       => 1001_1110
-[*] stc                        => 1111_1001
-[*] std                        => 1111_1101
-[*] sti                        => 1111_1011
-[*] xlat                       => 1101_0111
-[*] xlatb                      => 1101_0111
-
---------------------------------------------------------------------------------------
-x86GenOpImm
---------------------------------------------------------------------------------------
-[*] int UINT8                  => 1100_1101, UINT8
-
---------------------------------------------------------------------------------------
-x86GenOpRegImm
---------------------------------------------------------------------------------------
-[*] mov REG8',' UINT8          => 1100_0110, 11_000_REG8, UINT8
-[*] mov REG16',' UINT16        => 1100_0111, 11_000_REG16, UINT16
-
---------------------------------------------------------------------------------------
-x86GenOpRegReg
---------------------------------------------------------------------------------------
-[*] adc DESTREG8',' SRCREG8    => 0001_0000, 11_SRCREG8_DESTREG8
-[*] adc DESTREG16',' SRCREG16  => 0001_0001, 11_SRCREG16_DESTREG16
-
---------------------------------------------------------------------------------------
-Pending encodings
---------------------------------------------------------------------------------------
-[ ] adc REG8',' MEM8           => 0001_0010, MOD_REG8_MEM8[, <DISP8 | DISP16>]
-[ ] adc REG16',' MEM16         => 0001_0011, MOD_REG16_MEM16[, <DISP8 | DISP16>]
-[ ] adc MEM8',' REG8           => 0001_0000, MOD_REG8_MEM8[, <DISP8 | DISP16>]
-[ ] adc MEM16',' REG16         => 0001_0001, MOD_REG16_MEM16[, <DISP8 | DISP16>]
-[ ] adc REG8',' UINT8          => 1000_0000, 11_010_REG8, UINT8
-[ ] adc REG8',' INT8           => 1000_0010, 11_010_REG8, INT8
-[ ] adc REG16',' UINT16        => 1000_0001, 11_010_REG16, UINT16
-[ ] adc MEM8',' UINT8          => 1000_0000, MOD_010_MEM8[, <DISP8 | DISP16>], UINT8
-[ ] adc MEM8',' INT8           => 1000_0010, MOD_010_MEM8[, <DISP8 | DISP16>], INT8
-[ ] adc MEM16',' UINT16        => 1000_0001, MOD_010_MEM16[, <DISP8 | DISP16>], UINT16
-
-[ ] add DESTREG8',' SRCREG8    => 0000_0000, 11_SRCREG8_DESTREG8
-[ ] add DESTREG16',' SRCREG16  => 0000_0001, 11_SRCREG16_DESTREG16
-[ ] add REG8',' MEM8           => 0000_0010, MOD_REG8_MEM8[, <DISP8 | DISP16>]
-[ ] add REG16',' MEM16         => 0000_0011, MOD_REG16_MEM16[, <DISP8 | DISP16>]
-[ ] add MEM8',' REG8           => 0000_0000, MOD_REG8_MEM8[, <DISP8 | DISP16>]
-[ ] add MEM16',' REG16         => 0000_0001, MOD_REG16_MEM16[, <DISP8 | DISP16>]
-[ ] add REG8',' UINT8          => 1000_0000, 11_000_REG8, UINT8
-[ ] add REG8',' INT8           => 1000_0010, 11_000_REG8, INT8
-[ ] add REG16',' UINT16        => 1000_0001, 11_000_REG16, UINT16
-[ ] add MEM8',' UINT8          => 1000_0000, MOD_000_MEM8[, <DISP8 | DISP16>], UINT8
-[ ] add MEM8',' INT8           => 1000_0010, MOD_000_MEM8[, <DISP8 | DISP16>], INT8
-[ ] add MEM16',' UINT16        => 1000_0001, MOD_000_MEM16[, <DISP8 | DISP16>], UINT16
-
-[ ] and DESTREG8',' SRCREG8    => 0010_0000, 11_SRCREG8_DESTREG8
-[ ] and DESTREG16',' SRCREG16  => 0010_0001, 11_SRCREG16_DESTREG16
-[ ] and REG8',' MEM8           => 0010_0010, MOD_REG8_MEM8[, <DISP8 | DISP16>]
-[ ] and REG16',' MEM16         => 0010_0011, MOD_REG16_MEM16[, <DISP8 | DISP16>]
-[ ] and MEM8',' REG8           => 0010_0000, MOD_REG8_MEM8[, <DISP8 | DISP16>]
-[ ] and MEM16',' REG16         => 0010_0001, MOD_REG16_MEM16[, <DISP8 | DISP16>]
-[ ] and REG8',' UINT8          => 1000_0000, 11_100_REG8, UINT8
-[ ] and REG8',' INT8           => 1000_0010, 11_100_REG8, INT8
-[ ] and REG16',' UINT16        => 1000_0001, 11_100_REG16, UINT16
-[ ] and MEM8',' UINT8          => 1000_0000, MOD_100_MEM8[, <DISP8 | DISP16>], UINT8
-[ ] and MEM8',' INT8           => 1000_0010, MOD_100_MEM8[, <DISP8 | DISP16>], INT8
-[ ] and MEM16',' UINT16        => 1000_0001, MOD_100_MEM16[, <DISP8 | DISP16>], UINT16
-
-[ ] call [near] INT16          => 1110_1000, INT16
-[ ] call REG16                 => 1111_1111, 11_010_REG16
-[ ] call [near] MEM16          => 1111_1111, MOD_010_MEM16[, <DISP8 | DISP16>]
-
-[ ] call SEL16':'OFS16         => 1001_1010, OFS16, SEL16
-[ ] call MEM32                 => 1111_1111, MOD_011_MEM32[, <DISP8 | DISP16>]
-
-[ ] cmp DESTREG8',' SRCREG8    => 0011_1000, 11_SRCREG8_DESTREG8
-[ ] cmp DESTREG16',' SRCREG16  => 0011_1011, 11_SRCREG16_DESTREG16
-[ ] cmp REG8',' MEM8           => 0011_1000, MOD_REG8_MEM8[, <DISP8 | DISP16>]
-[ ] cmp REG16',' MEM16         => 0011_1001, MOD_REG16_MEM16[, <DISP8 | DISP16>]
-[ ] cmp MEM8',' REG8           => 0011_1010, MOD_REG8_MEM8[, <DISP8 | DISP16>]
-[ ] cmp MEM16',' REG16         => 0011_1011, MOD_REG16_MEM16[, <DISP8 | DISP16>]
-[ ] cmp REG8',' UINT8          => 1000_0000, 11_111_REG8, UINT8
-[ ] cmp REG8',' INT8           => 1000_0010, 11_111_REG8, INT8
-[ ] cmp REG16',' UINT16        => 1000_0001, 11_111_REG16, UINT16
-[ ] cmp MEM8',' UINT8          => 1000_0000, MOD_111_MEM8[, <DISP8 | DISP16>], UINT8
-[ ] cmp MEM8',' INT8           => 1000_0010, MOD_111_MEM8[, <DISP8 | DISP16>], INT8
-[ ] cmp MEM16',' UINT16        => 1000_0001, MOD_111_MEM16[, <DISP8 | DISP16>], UINT16
-
-[ ] dec REG8                   => 1111_1110, 11_001_REG8
-[ ] dec REG16                  => 1111_1111, 11_001_REG16
-[ ] dec MEM8                   => 1111_1110, MOD_001_MEM8[, <DISP8 | DISP16>]
-[ ] dec MEM16                  => 1111_1111, MOD_001_MEM16[, <DISP8 | DISP16>]
-
-[ ] div REG8                   => 1111_0110, 11_110_REG8
-[ ] div REG16                  => 1111_0111, 11_110_REG16
-[ ] div MEM8                   => 1111_0110, MOD_110_MEM8[, <DISP8 | DISP16>]
-[ ] div MEM16                  => 1111_0111, MOD_110_MEM16[, <DISP8 | DISP16>]
-
-[ ] idiv REG8                  => 1111_0110, 11_111_REG8
-[ ] idiv REG16                 => 1111_0111, 11_111_REG16
-[ ] idiv MEM8                  => 1111_0110, MOD_111_MEM8[, <DISP8 | DISP16>]
-[ ] idiv MEM16                 => 1111_0111, MOD_111_MEM16[, <DISP8 | DISP16>]
-
-[ ] imul REG8                  => 1111_0110, 11_101_REG8
-[ ] imul REG16                 => 1111_0111, 11_101_REG16
-[ ] imul MEM8                  => 1111_0110, MOD_101_REG8
-[ ] imul MEM16                 => 1111_0111, MOD_101_REG16
-
-[ ] in al',' UINT8             => 1110_0100, UINT8
-[ ] in ax',' UINT8             => 1110_0101, UINT8
-[ ] in al',' dx                => 1110_1100
-[ ] in ax',' dx                => 1110_1101
-
-[ ] inc REG8                   => 1111_1110, 11_000_REG8
-[ ] inc REG16                  => 1111_1111, 11_000_REG16
-[ ] inc MEM8                   => 1111_1110, MOD_000_MEM8[, <DISP8 | DISP16>]
-[ ] inc MEM16                  => 1111_1111, MOD_000_MEM16[, <DISP8 | DISP16>]
-
-[ ] jb [short] INT8            => 0111_0010, INT8
-[ ] jb [near] INT16            => 0000_1111, 1000_0010, INT16
-[ ] jc [short] INT8            => 0111_0010, INT8
-[ ] jc [near] INT16            => 0000_1111, 1000_0010, INT16
-[ ] jae [short] INT8           => 0111_0011, INT8
-[ ] jae [near] INT16           => 0000_1111, 1000_0011, INT16
-[ ] jnc [short] INT8           => 0111_0011, INT8
-[ ] jnc [near] INT16           => 0000_1111, 1000_0011, INT16
-[ ] je [short] INT8            => 0111_0100, INT8
-[ ] je [near] INT16            => 0000_1111, 1000_0100, INT16
-[ ] jz [short] INT8            => 0111_0100, INT8
-[ ] jz [near] INT16            => 0000_1111, 1000_0100, INT16
-[ ] jne [short] INT8           => 0111_0101, INT8
-[ ] jne [near] INT16           => 0000_1111, 1000_0101, INT16
-[ ] jnz [short] INT8           => 0111_0101, INT8
-[ ] jnz [near] INT16           => 0000_1111, 1000_0101, INT16
-[ ] jbe [short] INT8           => 0111_0110, INT8
-[ ] jbe [near] INT16           => 0000_1111, 1000_0110, INT16
-[ ] ja [short] INT8            => 0111_0111, INT8
-[ ] ja [near] INT16            => 0000_1111, 1000_0111, INT16
-[ ] js [short] INT8            => 0111_1000, INT8
-[ ] js [near] INT16            => 0000_1111, 1000_1000, INT16
-[ ] jns [short] INT8           => 0111_1001, INT8
-[ ] jns [near] INT16           => 0000_1111, 1000_1001, INT16
-[ ] jl [short] INT8            => 0111_1100, INT8
-[ ] jl [near] INT16            => 0000_1111, 1000_1100, INT16
-[ ] jge [short] INT8           => 0111_1101, INT8
-[ ] jge [near] INT16           => 0000_1111, 1000_1101, INT16
-[ ] jle [short] INT8           => 0111_1110, INT8
-[ ] jle [near] INT16           => 0000_1111, 1000_1110, INT16
-[ ] jg [short] INT8            => 0111_1111, INT8
-[ ] jg [near] INT16            => 0000_1111, 1000_1111, INT16
-
-[ ] jcxz INT8                  => 1110_0011, INT8
-
-[ ] jmp [short] INT8           => 1110_1011, INT8
-[ ] jmp [near] INT16           => 1110_1001, INT16
-[ ] jmp REG16                  => 1111_1111, 11_100_REG16
-[ ] jmp [near] MEM16           => 1111_1111, MOD_100_MEM16[, <DISP8 | DISP16>]
-
-[ ] jmp SEL16':'OFS16          => 1001_1010, OFS16, SEL16
-[ ] jmp MEM32                  => 1111_1111, MOD_101_MEM32[, <DISP8 | DISP16>]
-
-[ ] lds REG16',' MEM32         => 1100_0101, MODab_REG16_MEM32
-[ ] les REG16',' MEM32         => 1100_0100, MODab_REG16_MEM32
-
-[ ] lea REG16',' MEM32         => 1000_1101, MODa_REG16_MEM32
-
-[ ] loop INT8                  => 1110_0010, INT8
-[ ] loope INT8                 => 1110_0001, INT8
-[ ] loopz INT8                 => 1110_0001, INT8
-[ ] loopne INT8                => 1110_0000, INT8
-[ ] loopnz INT8                => 1110_0000, INT8
-
-[ ] mov DESTREG8',' SRCREG8    => 1000_1000, 11_SRCREG8_DESTREG8
-[ ] mov DESTREG16',' SRCREG16  => 1000_1001, 11_SRCREG16_DESTREG16
-[ ] mov REG8',' MEM8           => 1000_1010, MOD_REG8_MEM8[, <DISP8 | DISP16>]
-[ ] mov REG16',' MEM16         => 1000_1011, MOD_REG16_MEM16[, <DISP8 | DISP16>]
-[ ] mov MEM8',' REG8           => 1000_1000, MOD_REG8_MEM8[, <DISP8 | DISP16>]
-[ ] mov MEM16',' REG16         => 1000_1001, MOD_REG16_MEM16[, <DISP8 | DISP16>]
-[ ] mov MEM8',' UINT8          => 1100_0110, MOD_000_MEM8[, <DISP8 | DISP16>], UINT8
-[ ] mov MEM16',' UINT16        => 1100_0111, MOD_000_MEM16[, <DISP8 | DISP16>], UINT16
-
-[ ] mov SREG',' REG16          => 1000_1110, 11_SREG_REG16
-[ ] mov SREG',' MEM16          => 1000_1110, MOD_SREG_MEM16[, <DISP8 | DISP16>]
-[ ] mov REG16',' SREG          => 1000_1100, 11_SREG_REG16
-[ ] mov MEM16',' SREG          => 1000_1100, MOD_SREG_MEM16[, <DISP8 | DISP16>]
-
-[ ] mul REG8                   => 1111_0110, 11_100_REG8
-[ ] mul REG16                  => 1111_0111, 11_100_REG16
-[ ] mul MEM8                   => 1111_0110, MOD_100_MEM8[, <DISP8 | DISP16>]
-[ ] mul MEM16                  => 1111_0111, MOD_100_MEM16[, <DISP8 | DISP16>]
-
-[ ] neg REG8                   => 1111_0110, 11_011_REG8
-[ ] neg REG16                  => 1111_0111, 11_011_REG16
-[ ] neg MEM8                   => 1111_0110, MOD_011_MEM8[, <DISP8 | DISP16>]
-[ ] neg MEM16                  => 1111_0111, MOD_011_MEM16[, <DISP8 | DISP16>]
-
-[ ] not REG8                   => 1111_0110, 11_010_REG8
-[ ] not REG16                  => 1111_0111, 11_010_REG16
-[ ] not MEM8                   => 1111_0110, MOD_010_MEM8[, <DISP8 | DISP16>]
-[ ] not MEM16                  => 1111_0111, MOD_010_MEM16[, <DISP8 | DISP16>]
-
-[ ] or DESTREG8',' SRCREG8     => 0000_1000, 11_SRCREG8_DESTREG8
-[ ] or DESTREG16',' SRCREG16   => 0000_1011, 11_SRCREG16_DESTREG16
-[ ] or REG8',' MEM8            => 0000_1010, MOD_REG8_MEM8[, <DISP8 | DISP16>]
-[ ] or REG16',' MEM16          => 0000_1011, MOD_REG16_MEM16[, <DISP8 | DISP16>]
-[ ] or MEM8',' REG8            => 0000_1000, MOD_REG8_MEM8[, <DISP8 | DISP16>]
-[ ] or MEM16',' REG16          => 0000_1001, MOD_REG16_MEM16[, <DISP8 | DISP16>]
-[ ] or REG8',' UINT8           => 1000_0000, 11_001_REG8, UINT8
-[ ] or REG8',' INT8            => 1000_0010, 11_001_REG8, INT8
-[ ] or REG16',' UINT16         => 1000_0001, 11_001_REG16, UINT16
-[ ] or MEM8',' UINT8           => 1000_0000, MOD_001_MEM8[, <DISP8 | DISP16>], UINT8
-[ ] or MEM8',' INT8            => 1000_0010, MOD_001_MEM8[, <DISP8 | DISP16>], INT8
-[ ] or MEM16',' UINT16         => 1000_0001, MOD_001_MEM16[, <DISP8 | DISP16>], UINT16
-
-[ ] out al',' UINT8            => 1110_0110, UINT8
-[ ] out ax',' UINT8            => 1110_0111, UINT8
-[ ] out al',' dx               => 1110_1110
-[ ] out ax',' dx               => 1110_1111
-
-[ ] pop REG16                  => 0101_1_REG16
-[ ] pop MEM16                  => 1000_1111, MOD_000_MEM16[, <DISP8 | DISP16>]
-[ ] pop SREG                   => 000_SREG_111
-
-[ ] popf                       => 1001_1101
-
-[ ] push REG16                 => 0101_0_REG16
-[ ] push MEM16                 => 1111_1111, MOD_110_MEM16
-[ ] push UINT8                 => 0110_1000, UINT8
-[ ] push UINT16                => 0110_1010, UINT16
-[ ] push SREG                  => 000_SREG_110
-
-[ ] pushf                      => 1001_1100
-
-[ ] rcl REG8',' CL             => 1101_0010, 11_010_REG8
-[ ] rcl REG16',' CL            => 1101_0011, 11_010_REG16
-[ ] rcl MEM8',' CL             => 1101_0010, MOD_010_MEM8[, <DISP8 | DISP16>]
-[ ] rcl MEM16',' CL            => 1101_0011, MOD_010_MEM16[, <DISP8 | DISP16>]
-[ ] rcl REG8',' UINT8          => 1100_0000, 11_010_REG8, UINT8
-[ ] rcl REG16',' UINT8         => 1100_0001, 11_010_REG16, UINT8
-[ ] rcl MEM8',' UINT8          => 1100_0000, MOD_010_MEM8[, <DISP8 | DISP16>], UINT8
-[ ] rcl MEM16',' UINT8         => 1100_0001, MOD_010_MEM16[, <DISP8 | DISP16>], UINT8
-
-[ ] rcr REG8',' CL             => 1101_0010, 11_011_REG8
-[ ] rcr REG16',' CL            => 1101_0011, 11_011_REG16
-[ ] rcr MEM8',' CL             => 1101_0010, MOD_011_MEM8[, <DISP8 | DISP16>]
-[ ] rcr MEM16',' CL            => 1101_0011, MOD_011_MEM16[, <DISP8 | DISP16>]
-[ ] rcr REG8',' UINT8          => 1100_0000, 11_011_REG8, UINT8
-[ ] rcr REG16',' UINT8         => 1100_0001, 11_011_REG16, UINT8
-[ ] rcr MEM8',' UINT8          => 1100_0000, MOD_011_MEM8[, <DISP8 | DISP16>], UINT8
-[ ] rcr MEM16',' UINT8         => 1100_0001, MOD_011_MEM16[, <DISP8 | DISP16>], UINT8
-
-[ ] rep lodsb                  => 1111_0011, 1010_1100
-[ ] rep lodsw                  => 1111_0011, 1010_1101
-
-[ ] rep movsb                  => 1111_0011, 1010_0100
-[ ] rep movsw                  => 1111_0011, 1010_0101
-
-[ ] rep stosb                  => 1111_0011, 1010_1010
-[ ] rep stosw                  => 1111_0011, 1010_1011
-
-[ ] repe cmpsb                 => 1111_0011, 1010_0110
-[ ] repe cmpsw                 => 1111_0011, 1010_0111
-[ ] repne cmpsb                => 1111_0010, 1010_0110
-[ ] repne cmpsw                => 1111_0010, 1010_0111
-
-[ ] repe scasb                 => 1111_0011, 1010_1110
-[ ] repe scasb                 => 1111_0011, 1010_1111
-[ ] repne scasb                => 1111_0010, 1010_1110
-[ ] repne scasw                => 1111_0010, 1010_1111
-
-[ ] ret UINT16                 => 1100_0010, UINT16
-[ ] retf UINT16                => 1100_1010, UINT16
-
-[ ] rol REG8',' CL             => 1101_0010, 11_000_REG8
-[ ] rol REG16',' CL            => 1101_0011, 11_000_REG16
-[ ] rol MEM8',' CL             => 1101_0010, MOD_000_MEM8[, <DISP8 | DISP16>]
-[ ] rol MEM16',' CL            => 1101_0011, MOD_000_MEM16[, <DISP8 | DISP16>]
-[ ] rol REG8',' UINT8          => 1100_0000, 11_000_REG8, UINT8
-[ ] rol REG16',' UINT8         => 1100_0001, 11_000_REG16, UINT8
-[ ] rol MEM8',' UINT8          => 1100_0000, MOD_000_MEM8[, <DISP8 | DISP16>], UINT8
-[ ] rol MEM16',' UINT8         => 1100_0001, MOD_000_MEM16[, <DISP8 | DISP16>], UINT8
-
-[ ] ror REG8',' CL             => 1101_0010, 11_001_REG8
-[ ] ror REG16',' CL            => 1101_0011, 11_001_REG16
-[ ] ror MEM8',' CL             => 1101_0010, MOD_001_MEM8[, <DISP8 | DISP16>]
-[ ] ror MEM16',' CL            => 1101_0011, MOD_001_MEM16[, <DISP8 | DISP16>]
-[ ] ror REG8',' UINT8          => 1100_0000, 11_001_REG8, UINT8
-[ ] ror REG16',' UINT8         => 1100_0001, 11_001_REG16, UINT8
-[ ] ror MEM8',' UINT8          => 1100_0000, MOD_001_MEM8[, <DISP8 | DISP16>], UINT8
-[ ] ror MEM16',' UINT8         => 1100_0001, MOD_001_MEM16[, <DISP8 | DISP16>], UINT8
-
-[ ] sar REG8',' CL             => 1101_0010, 11_111_REG8
-[ ] sar REG16',' CL            => 1101_0011, 11_111_REG16
-[ ] sar MEM8',' CL             => 1101_0010, MOD_111_MEM8[, <DISP8 | DISP16>]
-[ ] sar MEM16',' CL            => 1101_0011, MOD_111_MEM16[, <DISP8 | DISP16>]
-[ ] sar REG8',' UINT8          => 1100_0000, 11_111_REG8, UINT8
-[ ] sar REG16',' UINT8         => 1100_0001, 11_111_REG16, UINT8
-[ ] sar MEM8',' UINT8          => 1100_0000, MOD_111_MEM8[, <DISP8 | DISP16>], UINT8
-[ ] sar MEM16',' UINT8         => 1100_0001, MOD_111_MEM16[, <DISP8 | DISP16>], UINT8
-
-[ ] sbb DESTREG8',' SRCREG8    => 0001_1000, 11_SRCREG8_DESTREG8
-[ ] sbb DESTREG16',' SRCREG16  => 0001_1001, 11_SRCREG16_DESTREG16
-[ ] sbb REG8',' MEM8           => 0001_1010, MOD_REG8_MEM8[, <DISP8 | DISP16>]
-[ ] sbb REG16',' MEM16         => 0001_1011, MOD_REG16_MEM16[, <DISP8 | DISP16>]
-[ ] sbb MEM8',' REG8           => 0001_1000, MOD_REG8_MEM8[, <DISP8 | DISP16>]
-[ ] sbb MEM16',' REG16         => 0001_1001, MOD_REG16_MEM16[, <DISP8 | DISP16>]
-[ ] sbb REG8',' UINT8          => 1000_0000, 11_011_REG8, UINT8
-[ ] sbb REG8',' INT8           => 1000_0010, 11_011_REG8, INT8
-[ ] sbb REG16',' UINT16        => 1000_0001, 11_011_REG16, UINT16
-[ ] sbb MEM8',' UINT8          => 1000_0000, MOD_011_MEM8[, <DISP8 | DISP16>], UINT8
-[ ] sbb MEM8',' INT8           => 1000_0010, MOD_011_MEM8[, <DISP8 | DISP16>], INT8
-[ ] sbb MEM16',' UINT16        => 1000_0001, MOD_011_MEM16[, <DISP8 | DISP16>], UINT16
-
-[ ] sal                        => shl
-[ ] shl REG8',' CL             => 1101_0010, 11_100_REG8
-[ ] shl REG16',' CL            => 1101_0011, 11_100_REG16
-[ ] shl MEM8',' CL             => 1101_0010, MOD_100_MEM8[, <DISP8 | DISP16>]
-[ ] shl MEM16',' CL            => 1101_0011, MOD_100_MEM16[, <DISP8 | DISP16>]
-[ ] shl REG8',' UINT8          => 1100_0000, 11_100_REG8, UINT8
-[ ] shl REG16',' UINT8         => 1100_0001, 11_100_REG16, UINT8
-[ ] shl MEM8',' UINT8          => 1100_0000, MOD_100_MEM8[, <DISP8 | DISP16>], UINT8
-[ ] shl MEM16',' UINT8         => 1100_0001, MOD_100_MEM16[, <DISP8 | DISP16>], UINT8
-
-[ ] shr REG8',' CL             => 1101_0010, 11_101_REG8
-[ ] shr REG16',' CL            => 1101_0011, 11_101_REG16
-[ ] shr MEM8',' CL             => 1101_0010, MOD_101_MEM8[, <DISP8 | DISP16>]
-[ ] shr MEM16',' CL            => 1101_0011, MOD_101_MEM16[, <DISP8 | DISP16>]
-[ ] shr REG8',' UINT8          => 1100_0000, 11_101_REG8, UINT8
-[ ] shr REG16',' UINT8         => 1100_0001, 11_101_REG16, UINT8
-[ ] shr MEM8',' UINT8          => 1100_0000, MOD_101_MEM8[, <DISP8 | DISP16>], UINT8
-[ ] shr MEM16',' UINT8         => 1100_0001, MOD_101_MEM16[, <DISP8 | DISP16>], UINT8
-
-[ ] sub DESTREG8',' SRCREG8    => 0010_1000, 11_SRCREG8_DESTREG8
-[ ] sub DESTREG16',' SRCREG16  => 0010_1001, 11_SRCREG16_DESTREG16
-[ ] sub REG8',' MEM8           => 0010_1010, MOD_REG8_MEM8[, <DISP8 | DISP16>]
-[ ] sub REG16',' MEM16         => 0010_1011, MOD_REG16_MEM16[, <DISP8 | DISP16>]
-[ ] sub MEM8',' REG8           => 0010_1000, MOD_REG8_MEM8[, <DISP8 | DISP16>]
-[ ] sub MEM16',' REG16         => 0010_1001, MOD_REG16_MEM16[, <DISP8 | DISP16>]
-[ ] sub REG8',' UINT8          => 1000_0000, 11_101_REG8, UINT8
-[ ] sub REG8',' INT8           => 1000_0010, 11_101_REG8, INT8
-[ ] sub REG16',' UINT16        => 1000_0001, 11_101_REG16, UINT16
-[ ] sub MEM8',' UINT8          => 1000_0000, MOD_101_MEM8[, <DISP8 | DISP16>], UINT8
-[ ] sub MEM8',' INT8           => 1000_0010, MOD_101_MEM8[, <DISP8 | DISP16>], INT8
-[ ] sub MEM16',' UINT16        => 1000_0001, MOD_101_MEM16[, <DISP8 | DISP16>], UINT16
-
-[ ] test DESTREG8',' SRCREG8   => 1000_0100, 11_SRCREG8_DESTREG8
-[ ] test DESTREG16',' SRCREG16 => 1000_0101, 11_SRCREG16_DESTREG16
-[ ] test REG8',' MEM8          => 1000_0100, MOD_REG8_MEM8[, <DISP8 | DISP16>]
-[ ] test REG16',' MEM16        => 1000_0101, MOD_REG8_MEM16[, <DISP8 | DISP16>]
-[ ] test REG8',' UINT8         => 1111_0110, 11_000_REG8
-[ ] test REG16',' UINT16       => 1111_0111, 11_000_REG16
-[ ] test MEM8',' UINT8         => 1111_0110, MOD_000_MEM8[, <DISP8 | DISP16>], UINT8
-[ ] test MEM16',' UINT16       => 1111_0111, MOD_000_MEM8[, <DISP8 | DISP16>], UINT16
-
-[ ] xchg DESTREG8',' SRCREG8   => 1000_0110, 11_SRCREG8_DESTREG8
-[ ] xchg DESTREG16',' SRCREG16 => 1000_0111, 11_SRCREG16_DESTREG16
-[ ] xchg REG8',' MEM8          => 1000_0110, MOD_REG8_MEM8[, <DISP8 | DISP16>]
-[ ] xchg REG16',' MEM16        => 1000_0111, MOD_REG16_MEM16[, <DISP8 | DISP16>]
-
-[ ] xor DESTREG8',' SRCREG8    => 0011_0000, 11_SRCREG8_DESTREG8
-[ ] xor DESTREG16',' SRCREG16  => 0011_0001, 11_SRCREG16_DESTREG16
-[ ] xor REG8',' MEM8           => 0011_0010, MOD_REG8_MEM8[, <DISP8 | DISP16>]
-[ ] xor REG16',' MEM16         => 0011_0011, MOD_REG16_MEM16[, <DISP8 | DISP16>]
-[ ] xor MEM8',' REG8           => 0011_0000, MOD_REG8_MEM8[, <DISP8 | DISP16>]
-[ ] xor MEM16',' REG16         => 0011_0001, MOD_REG16_MEM16[, <DISP8 | DISP16>]
-[ ] xor REG8',' UINT8          => 1000_0000, 11_110_REG8, UINT8
-[ ] xor REG8',' INT8           => 1000_0010, 11_110_REG8, INT8
-[ ] xor REG16',' UINT16        => 1000_0001, 11_110_REG16, UINT16
-[ ] xor MEM8',' UINT8          => 1000_0000, MOD_110_MEM8[, <DISP8 | DISP16>], UINT8
-[ ] xor MEM8',' INT8           => 1000_0010, MOD_110_MEM8[, <DISP8 | DISP16>], INT8
-[ ] xor MEM16',' UINT16        => 1000_0001, MOD_110_MEM16[, <DISP8 | DISP16>], UINT16
+  This section based on Table 2-1 16-Bit Addressing Forms with the ModR/M Byte
+    from the Intel 64 and IA-32 Architectures Software Developer's Manual
+
+  SS is the default segment register when BP is used as an index
+
+  ModR/M = | 2-bit MOD | 3-bit REG | 3-bit RM ]
+
+  ---------------------------------------------------------------------------
+  Opcode extension encodings for /0 .. /7
+  ---------------------------------------------------------------------------
+  /0                  => MOD_000_RM
+  /1                  => MOD_001_RM
+  /2                  => MOD_010_RM
+  /3                  => MOD_011_RM
+  /4                  => MOD_100_RM
+  /5                  => MOD_101_RM
+  /6                  => MOD_110_RM
+  /7                  => MOD_111_RM
+
+  ---------------------------------------------------------------------------
+  /r for 8-bit registers
+  ---------------------------------------------------------------------------
+  AL                  => MOD_000_RM
+  CL                  => MOD_001_RM
+  DL                  => MOD_010_RM
+  BL                  => MOD_011_RM
+  AH                  => MOD_100_RM
+  CH                  => MOD_101_RM
+  DH                  => MOD_110_RM
+  BH                  => MOD_111_RM
+
+  ---------------------------------------------------------------------------
+  /r for 16-bit registers
+  ---------------------------------------------------------------------------
+  AX                  => MOD_000_RM
+  CX                  => MOD_001_RM
+  DX                  => MOD_010_RM
+  BX                  => MOD_011_RM
+  SP                  => MOD_100_RM
+  BP                  => MOD_101_RM
+  SI                  => MOD_110_RM
+  DI                  => MOD_111_RM
+
+  ---------------------------------------------------------------------------
+  MOD 00
+  ---------------------------------------------------------------------------
+  [BX + SI]           => 00_REG_000
+  [BX + DI]           => 00_REG_001
+  [BP + SI]           => 00_REG_010
+  [BP + DI]           => 00_REG_011
+  [SI]                => 00_REG_100
+  [DI]                => 00_REG_101
+  DISP16              => 00_REG_110
+  [BX]                => 00_REG_111
+
+  - DISP16 is an index within the default, or specified, segment
+
+  ---------------------------------------------------------------------------
+  MOD 01
+  ---------------------------------------------------------------------------
+  [BX + SI] + DISP8   => 01_REG_000
+  [BX + DI] + DISP8   => 01_REG_001
+  [BP + SI] + DISP8   => 01_REG_010
+  [BP + DI] + DISP8   => 01_REG_011
+  [SI] + DISP8        => 01_REG_100
+  [DI] + DISP8        => 01_REG_101
+  [BP] + DISP8        => 01_REG_110
+  [BX] + DISP8        => 01_REG_111
+
+  - DISP8 is sign extended (for all of MOD 01?)
+
+  ---------------------------------------------------------------------------
+  MOD 10
+  ---------------------------------------------------------------------------
+  [BX + SI] + DISP16  => 10_REG_000
+  [BX + DI] + DISP16  => 10_REG_001
+  [BP + SI] + DISP16  => 10_REG_010
+  [BP + DI] + DISP16  => 10_REG_011
+  [SI] + DISP16       => 10_REG_100
+  [DI] + DISP16       => 10_REG_101
+  [BP] + DISP16       => 10_REG_110
+  [BX] + DISP16       => 10_REG_111
+
+  ---------------------------------------------------------------------------
+  MOD 11 for 8-Bit Registers
+  ---------------------------------------------------------------------------
+  AL                  => 11_REG_000
+  CL                  => 11_REG_001
+  DL                  => 11_REG_010
+  BL                  => 11_REG_011
+  AH                  => 11_REG_100
+  CH                  => 11_REG_101
+  DH                  => 11_REG_110
+  BH                  => 11_REG_111
+
+  ---------------------------------------------------------------------------
+  MOD 11 for 16-Bit Registers
+  ---------------------------------------------------------------------------
+  AX                  => 11_REG_000
+  CX                  => 11_REG_001
+  DX                  => 11_REG_010
+  BX                  => 11_REG_011
+  SP                  => 11_REG_100
+  BP                  => 11_REG_101
+  SI                  => 11_REG_110
+  DI                  => 11_REG_111
+                                        --
+
+                  17) x86 Instruction Encodings for x86GenXYZ
+
+  Instruction encodings based on Section B.2 General-Purpose Instruction
+    Formats and Encodings For Non-64-Bit Modes.
+
+                                [ ] = Untested
+                                [*] = Tested
+
+  ---------------------------------------------------------------------------
+  x86GenOp
+  ---------------------------------------------------------------------------
+  [*] cbw                        => 1001_1000
+  [*] cwd                        => 1001_1001
+  [*] clc                        => 1111_1000
+  [*] cld                        => 1111_1100
+  [*] cli                        => 1111_1010
+  [*] cmc                        => 1111_0101
+  [*] int3                       => 1100_1100
+  [*] iret                       => 1100_1111
+  [*] lahf                       => 1001_1111
+  [*] nop                        => 1001_0000
+  [*] ret                        => 1100_0011
+  [*] retf                       => 1100_1011
+  [*] sahf                       => 1001_1110
+  [*] stc                        => 1111_1001
+  [*] std                        => 1111_1101
+  [*] sti                        => 1111_1011
+  [*] xlat                       => 1101_0111
+  [*] xlatb                      => 1101_0111
+
+  ---------------------------------------------------------------------------
+  x86GenRepOp
+  ---------------------------------------------------------------------------
+
+  ---------------------------------------------------------------------------
+  x86GenOpImm
+  ---------------------------------------------------------------------------
+  [*] int UINT8                  => 1100_1101, UINT8
+
+  ---------------------------------------------------------------------------
+  x86GenOpReg
+  ---------------------------------------------------------------------------
+
+  ---------------------------------------------------------------------------
+  x86GenOpMem
+  ---------------------------------------------------------------------------
+
+  ---------------------------------------------------------------------------
+  x86GenOpRegImm
+  ---------------------------------------------------------------------------
+  [*] mov REG8',' UINT8          => 1100_0110, 11_000_REG8, UINT8
+  [*] mov REG16',' UINT16        => 1100_0111, 11_000_REG16, UINT16
+
+  ---------------------------------------------------------------------------
+  x86GenOpRegReg
+  ---------------------------------------------------------------------------
+  [*] adc DESTREG8',' SRCREG8    => 0001_0000, 11_SRCREG8_DESTREG8
+  [*] adc DESTREG16',' SRCREG16  => 0001_0001, 11_SRCREG16_DESTREG16
+
+  ---------------------------------------------------------------------------
+  x86GenOpRegMem
+  ---------------------------------------------------------------------------
+
+  ---------------------------------------------------------------------------
+  x86GenOpMemImm
+  ---------------------------------------------------------------------------
+
+  ---------------------------------------------------------------------------
+  x86GenOpMemReg
+  ---------------------------------------------------------------------------
+
+  ---------------------------------------------------------------------------
+  Pending encodings
+  ---------------------------------------------------------------------------
+  [ ] adc REG8',' MEM8           => 0001_0010, MOD_REG8_MEM8[, <DISP8 | DISP16>]
+  [ ] adc REG16',' MEM16         => 0001_0011, MOD_REG16_MEM16[, <DISP8 | DISP16>]
+  [ ] adc MEM8',' REG8           => 0001_0000, MOD_REG8_MEM8[, <DISP8 | DISP16>]
+  [ ] adc MEM16',' REG16         => 0001_0001, MOD_REG16_MEM16[, <DISP8 | DISP16>]
+  [ ] adc REG8',' UINT8          => 1000_0000, 11_010_REG8, UINT8
+  [ ] adc REG8',' INT8           => 1000_0010, 11_010_REG8, INT8
+  [ ] adc REG16',' UINT16        => 1000_0001, 11_010_REG16, UINT16
+  [ ] adc MEM8',' UINT8          => 1000_0000, MOD_010_MEM8[, <DISP8 | DISP16>], UINT8
+  [ ] adc MEM8',' INT8           => 1000_0010, MOD_010_MEM8[, <DISP8 | DISP16>], INT8
+  [ ] adc MEM16',' UINT16        => 1000_0001, MOD_010_MEM16[, <DISP8 | DISP16>], UINT16
+
+  [ ] add DESTREG8',' SRCREG8    => 0000_0000, 11_SRCREG8_DESTREG8
+  [ ] add DESTREG16',' SRCREG16  => 0000_0001, 11_SRCREG16_DESTREG16
+  [ ] add REG8',' MEM8           => 0000_0010, MOD_REG8_MEM8[, <DISP8 | DISP16>]
+  [ ] add REG16',' MEM16         => 0000_0011, MOD_REG16_MEM16[, <DISP8 | DISP16>]
+  [ ] add MEM8',' REG8           => 0000_0000, MOD_REG8_MEM8[, <DISP8 | DISP16>]
+  [ ] add MEM16',' REG16         => 0000_0001, MOD_REG16_MEM16[, <DISP8 | DISP16>]
+  [ ] add REG8',' UINT8          => 1000_0000, 11_000_REG8, UINT8
+  [ ] add REG8',' INT8           => 1000_0010, 11_000_REG8, INT8
+  [ ] add REG16',' UINT16        => 1000_0001, 11_000_REG16, UINT16
+  [ ] add MEM8',' UINT8          => 1000_0000, MOD_000_MEM8[, <DISP8 | DISP16>], UINT8
+  [ ] add MEM8',' INT8           => 1000_0010, MOD_000_MEM8[, <DISP8 | DISP16>], INT8
+  [ ] add MEM16',' UINT16        => 1000_0001, MOD_000_MEM16[, <DISP8 | DISP16>], UINT16
+
+  [ ] and DESTREG8',' SRCREG8    => 0010_0000, 11_SRCREG8_DESTREG8
+  [ ] and DESTREG16',' SRCREG16  => 0010_0001, 11_SRCREG16_DESTREG16
+  [ ] and REG8',' MEM8           => 0010_0010, MOD_REG8_MEM8[, <DISP8 | DISP16>]
+  [ ] and REG16',' MEM16         => 0010_0011, MOD_REG16_MEM16[, <DISP8 | DISP16>]
+  [ ] and MEM8',' REG8           => 0010_0000, MOD_REG8_MEM8[, <DISP8 | DISP16>]
+  [ ] and MEM16',' REG16         => 0010_0001, MOD_REG16_MEM16[, <DISP8 | DISP16>]
+  [ ] and REG8',' UINT8          => 1000_0000, 11_100_REG8, UINT8
+  [ ] and REG8',' INT8           => 1000_0010, 11_100_REG8, INT8
+  [ ] and REG16',' UINT16        => 1000_0001, 11_100_REG16, UINT16
+  [ ] and MEM8',' UINT8          => 1000_0000, MOD_100_MEM8[, <DISP8 | DISP16>], UINT8
+  [ ] and MEM8',' INT8           => 1000_0010, MOD_100_MEM8[, <DISP8 | DISP16>], INT8
+  [ ] and MEM16',' UINT16        => 1000_0001, MOD_100_MEM16[, <DISP8 | DISP16>], UINT16
+
+  [ ] call [near] INT16          => 1110_1000, INT16
+  [ ] call REG16                 => 1111_1111, 11_010_REG16
+  [ ] call [near] MEM16          => 1111_1111, MOD_010_MEM16[, <DISP8 | DISP16>]
+
+  [ ] call SEL16':'OFS16         => 1001_1010, OFS16, SEL16
+  [ ] call MEM32                 => 1111_1111, MOD_011_MEM32[, <DISP8 | DISP16>]
+
+  [ ] cmp DESTREG8',' SRCREG8    => 0011_1000, 11_SRCREG8_DESTREG8
+  [ ] cmp DESTREG16',' SRCREG16  => 0011_1011, 11_SRCREG16_DESTREG16
+  [ ] cmp REG8',' MEM8           => 0011_1000, MOD_REG8_MEM8[, <DISP8 | DISP16>]
+  [ ] cmp REG16',' MEM16         => 0011_1001, MOD_REG16_MEM16[, <DISP8 | DISP16>]
+  [ ] cmp MEM8',' REG8           => 0011_1010, MOD_REG8_MEM8[, <DISP8 | DISP16>]
+  [ ] cmp MEM16',' REG16         => 0011_1011, MOD_REG16_MEM16[, <DISP8 | DISP16>]
+  [ ] cmp REG8',' UINT8          => 1000_0000, 11_111_REG8, UINT8
+  [ ] cmp REG8',' INT8           => 1000_0010, 11_111_REG8, INT8
+  [ ] cmp REG16',' UINT16        => 1000_0001, 11_111_REG16, UINT16
+  [ ] cmp MEM8',' UINT8          => 1000_0000, MOD_111_MEM8[, <DISP8 | DISP16>], UINT8
+  [ ] cmp MEM8',' INT8           => 1000_0010, MOD_111_MEM8[, <DISP8 | DISP16>], INT8
+  [ ] cmp MEM16',' UINT16        => 1000_0001, MOD_111_MEM16[, <DISP8 | DISP16>], UINT16
+
+  [ ] dec REG8                   => 1111_1110, 11_001_REG8
+  [ ] dec REG16                  => 1111_1111, 11_001_REG16
+  [ ] dec MEM8                   => 1111_1110, MOD_001_MEM8[, <DISP8 | DISP16>]
+  [ ] dec MEM16                  => 1111_1111, MOD_001_MEM16[, <DISP8 | DISP16>]
+
+  [ ] div REG8                   => 1111_0110, 11_110_REG8
+  [ ] div REG16                  => 1111_0111, 11_110_REG16
+  [ ] div MEM8                   => 1111_0110, MOD_110_MEM8[, <DISP8 | DISP16>]
+  [ ] div MEM16                  => 1111_0111, MOD_110_MEM16[, <DISP8 | DISP16>]
+
+  [ ] idiv REG8                  => 1111_0110, 11_111_REG8
+  [ ] idiv REG16                 => 1111_0111, 11_111_REG16
+  [ ] idiv MEM8                  => 1111_0110, MOD_111_MEM8[, <DISP8 | DISP16>]
+  [ ] idiv MEM16                 => 1111_0111, MOD_111_MEM16[, <DISP8 | DISP16>]
+
+  [ ] imul REG8                  => 1111_0110, 11_101_REG8
+  [ ] imul REG16                 => 1111_0111, 11_101_REG16
+  [ ] imul MEM8                  => 1111_0110, MOD_101_REG8
+  [ ] imul MEM16                 => 1111_0111, MOD_101_REG16
+
+  [ ] in al',' UINT8             => 1110_0100, UINT8
+  [ ] in ax',' UINT8             => 1110_0101, UINT8
+  [ ] in al',' dx                => 1110_1100
+  [ ] in ax',' dx                => 1110_1101
+
+  [ ] inc REG8                   => 1111_1110, 11_000_REG8
+  [ ] inc REG16                  => 1111_1111, 11_000_REG16
+  [ ] inc MEM8                   => 1111_1110, MOD_000_MEM8[, <DISP8 | DISP16>]
+  [ ] inc MEM16                  => 1111_1111, MOD_000_MEM16[, <DISP8 | DISP16>]
+
+  [ ] jb [short] INT8            => 0111_0010, INT8
+  [ ] jb [near] INT16            => 0000_1111, 1000_0010, INT16
+  [ ] jc [short] INT8            => 0111_0010, INT8
+  [ ] jc [near] INT16            => 0000_1111, 1000_0010, INT16
+  [ ] jae [short] INT8           => 0111_0011, INT8
+  [ ] jae [near] INT16           => 0000_1111, 1000_0011, INT16
+  [ ] jnc [short] INT8           => 0111_0011, INT8
+  [ ] jnc [near] INT16           => 0000_1111, 1000_0011, INT16
+  [ ] je [short] INT8            => 0111_0100, INT8
+  [ ] je [near] INT16            => 0000_1111, 1000_0100, INT16
+  [ ] jz [short] INT8            => 0111_0100, INT8
+  [ ] jz [near] INT16            => 0000_1111, 1000_0100, INT16
+  [ ] jne [short] INT8           => 0111_0101, INT8
+  [ ] jne [near] INT16           => 0000_1111, 1000_0101, INT16
+  [ ] jnz [short] INT8           => 0111_0101, INT8
+  [ ] jnz [near] INT16           => 0000_1111, 1000_0101, INT16
+  [ ] jbe [short] INT8           => 0111_0110, INT8
+  [ ] jbe [near] INT16           => 0000_1111, 1000_0110, INT16
+  [ ] ja [short] INT8            => 0111_0111, INT8
+  [ ] ja [near] INT16            => 0000_1111, 1000_0111, INT16
+  [ ] js [short] INT8            => 0111_1000, INT8
+  [ ] js [near] INT16            => 0000_1111, 1000_1000, INT16
+  [ ] jns [short] INT8           => 0111_1001, INT8
+  [ ] jns [near] INT16           => 0000_1111, 1000_1001, INT16
+  [ ] jl [short] INT8            => 0111_1100, INT8
+  [ ] jl [near] INT16            => 0000_1111, 1000_1100, INT16
+  [ ] jge [short] INT8           => 0111_1101, INT8
+  [ ] jge [near] INT16           => 0000_1111, 1000_1101, INT16
+  [ ] jle [short] INT8           => 0111_1110, INT8
+  [ ] jle [near] INT16           => 0000_1111, 1000_1110, INT16
+  [ ] jg [short] INT8            => 0111_1111, INT8
+  [ ] jg [near] INT16            => 0000_1111, 1000_1111, INT16
+
+  [ ] jcxz INT8                  => 1110_0011, INT8
+
+  [ ] jmp [short] INT8           => 1110_1011, INT8
+  [ ] jmp [near] INT16           => 1110_1001, INT16
+  [ ] jmp REG16                  => 1111_1111, 11_100_REG16
+  [ ] jmp [near] MEM16           => 1111_1111, MOD_100_MEM16[, <DISP8 | DISP16>]
+
+  [ ] jmp SEL16':'OFS16          => 1001_1010, OFS16, SEL16
+  [ ] jmp MEM32                  => 1111_1111, MOD_101_MEM32[, <DISP8 | DISP16>]
+
+  [ ] lds REG16',' MEM32         => 1100_0101, MODab_REG16_MEM32
+  [ ] les REG16',' MEM32         => 1100_0100, MODab_REG16_MEM32
+
+  [ ] lea REG16',' MEM32         => 1000_1101, MODa_REG16_MEM32
+
+  [ ] loop INT8                  => 1110_0010, INT8
+  [ ] loope INT8                 => 1110_0001, INT8
+  [ ] loopz INT8                 => 1110_0001, INT8
+  [ ] loopne INT8                => 1110_0000, INT8
+  [ ] loopnz INT8                => 1110_0000, INT8
+
+  [ ] mov DESTREG8',' SRCREG8    => 1000_1000, 11_SRCREG8_DESTREG8
+  [ ] mov DESTREG16',' SRCREG16  => 1000_1001, 11_SRCREG16_DESTREG16
+  [ ] mov REG8',' MEM8           => 1000_1010, MOD_REG8_MEM8[, <DISP8 | DISP16>]
+  [ ] mov REG16',' MEM16         => 1000_1011, MOD_REG16_MEM16[, <DISP8 | DISP16>]
+  [ ] mov MEM8',' REG8           => 1000_1000, MOD_REG8_MEM8[, <DISP8 | DISP16>]
+  [ ] mov MEM16',' REG16         => 1000_1001, MOD_REG16_MEM16[, <DISP8 | DISP16>]
+  [ ] mov MEM8',' UINT8          => 1100_0110, MOD_000_MEM8[, <DISP8 | DISP16>], UINT8
+  [ ] mov MEM16',' UINT16        => 1100_0111, MOD_000_MEM16[, <DISP8 | DISP16>], UINT16
+
+  [ ] mov SREG',' REG16          => 1000_1110, 11_SREG_REG16
+  [ ] mov SREG',' MEM16          => 1000_1110, MOD_SREG_MEM16[, <DISP8 | DISP16>]
+  [ ] mov REG16',' SREG          => 1000_1100, 11_SREG_REG16
+  [ ] mov MEM16',' SREG          => 1000_1100, MOD_SREG_MEM16[, <DISP8 | DISP16>]
+
+  [ ] mul REG8                   => 1111_0110, 11_100_REG8
+  [ ] mul REG16                  => 1111_0111, 11_100_REG16
+  [ ] mul MEM8                   => 1111_0110, MOD_100_MEM8[, <DISP8 | DISP16>]
+  [ ] mul MEM16                  => 1111_0111, MOD_100_MEM16[, <DISP8 | DISP16>]
+
+  [ ] neg REG8                   => 1111_0110, 11_011_REG8
+  [ ] neg REG16                  => 1111_0111, 11_011_REG16
+  [ ] neg MEM8                   => 1111_0110, MOD_011_MEM8[, <DISP8 | DISP16>]
+  [ ] neg MEM16                  => 1111_0111, MOD_011_MEM16[, <DISP8 | DISP16>]
+
+  [ ] not REG8                   => 1111_0110, 11_010_REG8
+  [ ] not REG16                  => 1111_0111, 11_010_REG16
+  [ ] not MEM8                   => 1111_0110, MOD_010_MEM8[, <DISP8 | DISP16>]
+  [ ] not MEM16                  => 1111_0111, MOD_010_MEM16[, <DISP8 | DISP16>]
+
+  [ ] or DESTREG8',' SRCREG8     => 0000_1000, 11_SRCREG8_DESTREG8
+  [ ] or DESTREG16',' SRCREG16   => 0000_1011, 11_SRCREG16_DESTREG16
+  [ ] or REG8',' MEM8            => 0000_1010, MOD_REG8_MEM8[, <DISP8 | DISP16>]
+  [ ] or REG16',' MEM16          => 0000_1011, MOD_REG16_MEM16[, <DISP8 | DISP16>]
+  [ ] or MEM8',' REG8            => 0000_1000, MOD_REG8_MEM8[, <DISP8 | DISP16>]
+  [ ] or MEM16',' REG16          => 0000_1001, MOD_REG16_MEM16[, <DISP8 | DISP16>]
+  [ ] or REG8',' UINT8           => 1000_0000, 11_001_REG8, UINT8
+  [ ] or REG8',' INT8            => 1000_0010, 11_001_REG8, INT8
+  [ ] or REG16',' UINT16         => 1000_0001, 11_001_REG16, UINT16
+  [ ] or MEM8',' UINT8           => 1000_0000, MOD_001_MEM8[, <DISP8 | DISP16>], UINT8
+  [ ] or MEM8',' INT8            => 1000_0010, MOD_001_MEM8[, <DISP8 | DISP16>], INT8
+  [ ] or MEM16',' UINT16         => 1000_0001, MOD_001_MEM16[, <DISP8 | DISP16>], UINT16
+
+  [ ] out al',' UINT8            => 1110_0110, UINT8
+  [ ] out ax',' UINT8            => 1110_0111, UINT8
+  [ ] out al',' dx               => 1110_1110
+  [ ] out ax',' dx               => 1110_1111
+
+  [ ] pop REG16                  => 0101_1_REG16
+  [ ] pop MEM16                  => 1000_1111, MOD_000_MEM16[, <DISP8 | DISP16>]
+  [ ] pop SREG                   => 000_SREG_111
+
+  [ ] popf                       => 1001_1101
+
+  [ ] push REG16                 => 0101_0_REG16
+  [ ] push MEM16                 => 1111_1111, MOD_110_MEM16
+  [ ] push UINT8                 => 0110_1000, UINT8
+  [ ] push UINT16                => 0110_1010, UINT16
+  [ ] push SREG                  => 000_SREG_110
+
+  [ ] pushf                      => 1001_1100
+
+  [ ] rcl REG8',' CL             => 1101_0010, 11_010_REG8
+  [ ] rcl REG16',' CL            => 1101_0011, 11_010_REG16
+  [ ] rcl MEM8',' CL             => 1101_0010, MOD_010_MEM8[, <DISP8 | DISP16>]
+  [ ] rcl MEM16',' CL            => 1101_0011, MOD_010_MEM16[, <DISP8 | DISP16>]
+  [ ] rcl REG8',' UINT8          => 1100_0000, 11_010_REG8, UINT8
+  [ ] rcl REG16',' UINT8         => 1100_0001, 11_010_REG16, UINT8
+  [ ] rcl MEM8',' UINT8          => 1100_0000, MOD_010_MEM8[, <DISP8 | DISP16>], UINT8
+  [ ] rcl MEM16',' UINT8         => 1100_0001, MOD_010_MEM16[, <DISP8 | DISP16>], UINT8
+
+  [ ] rcr REG8',' CL             => 1101_0010, 11_011_REG8
+  [ ] rcr REG16',' CL            => 1101_0011, 11_011_REG16
+  [ ] rcr MEM8',' CL             => 1101_0010, MOD_011_MEM8[, <DISP8 | DISP16>]
+  [ ] rcr MEM16',' CL            => 1101_0011, MOD_011_MEM16[, <DISP8 | DISP16>]
+  [ ] rcr REG8',' UINT8          => 1100_0000, 11_011_REG8, UINT8
+  [ ] rcr REG16',' UINT8         => 1100_0001, 11_011_REG16, UINT8
+  [ ] rcr MEM8',' UINT8          => 1100_0000, MOD_011_MEM8[, <DISP8 | DISP16>], UINT8
+  [ ] rcr MEM16',' UINT8         => 1100_0001, MOD_011_MEM16[, <DISP8 | DISP16>], UINT8
+
+  [ ] rep lodsb                  => 1111_0011, 1010_1100
+  [ ] rep lodsw                  => 1111_0011, 1010_1101
+
+  [ ] rep movsb                  => 1111_0011, 1010_0100
+  [ ] rep movsw                  => 1111_0011, 1010_0101
+
+  [ ] rep stosb                  => 1111_0011, 1010_1010
+  [ ] rep stosw                  => 1111_0011, 1010_1011
+
+  [ ] repe cmpsb                 => 1111_0011, 1010_0110
+  [ ] repe cmpsw                 => 1111_0011, 1010_0111
+  [ ] repne cmpsb                => 1111_0010, 1010_0110
+  [ ] repne cmpsw                => 1111_0010, 1010_0111
+
+  [ ] repe scasb                 => 1111_0011, 1010_1110
+  [ ] repe scasb                 => 1111_0011, 1010_1111
+  [ ] repne scasb                => 1111_0010, 1010_1110
+  [ ] repne scasw                => 1111_0010, 1010_1111
+
+  [ ] ret UINT16                 => 1100_0010, UINT16
+  [ ] retf UINT16                => 1100_1010, UINT16
+
+  [ ] rol REG8',' CL             => 1101_0010, 11_000_REG8
+  [ ] rol REG16',' CL            => 1101_0011, 11_000_REG16
+  [ ] rol MEM8',' CL             => 1101_0010, MOD_000_MEM8[, <DISP8 | DISP16>]
+  [ ] rol MEM16',' CL            => 1101_0011, MOD_000_MEM16[, <DISP8 | DISP16>]
+  [ ] rol REG8',' UINT8          => 1100_0000, 11_000_REG8, UINT8
+  [ ] rol REG16',' UINT8         => 1100_0001, 11_000_REG16, UINT8
+  [ ] rol MEM8',' UINT8          => 1100_0000, MOD_000_MEM8[, <DISP8 | DISP16>], UINT8
+  [ ] rol MEM16',' UINT8         => 1100_0001, MOD_000_MEM16[, <DISP8 | DISP16>], UINT8
+
+  [ ] ror REG8',' CL             => 1101_0010, 11_001_REG8
+  [ ] ror REG16',' CL            => 1101_0011, 11_001_REG16
+  [ ] ror MEM8',' CL             => 1101_0010, MOD_001_MEM8[, <DISP8 | DISP16>]
+  [ ] ror MEM16',' CL            => 1101_0011, MOD_001_MEM16[, <DISP8 | DISP16>]
+  [ ] ror REG8',' UINT8          => 1100_0000, 11_001_REG8, UINT8
+  [ ] ror REG16',' UINT8         => 1100_0001, 11_001_REG16, UINT8
+  [ ] ror MEM8',' UINT8          => 1100_0000, MOD_001_MEM8[, <DISP8 | DISP16>], UINT8
+  [ ] ror MEM16',' UINT8         => 1100_0001, MOD_001_MEM16[, <DISP8 | DISP16>], UINT8
+
+  [ ] sar REG8',' CL             => 1101_0010, 11_111_REG8
+  [ ] sar REG16',' CL            => 1101_0011, 11_111_REG16
+  [ ] sar MEM8',' CL             => 1101_0010, MOD_111_MEM8[, <DISP8 | DISP16>]
+  [ ] sar MEM16',' CL            => 1101_0011, MOD_111_MEM16[, <DISP8 | DISP16>]
+  [ ] sar REG8',' UINT8          => 1100_0000, 11_111_REG8, UINT8
+  [ ] sar REG16',' UINT8         => 1100_0001, 11_111_REG16, UINT8
+  [ ] sar MEM8',' UINT8          => 1100_0000, MOD_111_MEM8[, <DISP8 | DISP16>], UINT8
+  [ ] sar MEM16',' UINT8         => 1100_0001, MOD_111_MEM16[, <DISP8 | DISP16>], UINT8
+
+  [ ] sbb DESTREG8',' SRCREG8    => 0001_1000, 11_SRCREG8_DESTREG8
+  [ ] sbb DESTREG16',' SRCREG16  => 0001_1001, 11_SRCREG16_DESTREG16
+  [ ] sbb REG8',' MEM8           => 0001_1010, MOD_REG8_MEM8[, <DISP8 | DISP16>]
+  [ ] sbb REG16',' MEM16         => 0001_1011, MOD_REG16_MEM16[, <DISP8 | DISP16>]
+  [ ] sbb MEM8',' REG8           => 0001_1000, MOD_REG8_MEM8[, <DISP8 | DISP16>]
+  [ ] sbb MEM16',' REG16         => 0001_1001, MOD_REG16_MEM16[, <DISP8 | DISP16>]
+  [ ] sbb REG8',' UINT8          => 1000_0000, 11_011_REG8, UINT8
+  [ ] sbb REG8',' INT8           => 1000_0010, 11_011_REG8, INT8
+  [ ] sbb REG16',' UINT16        => 1000_0001, 11_011_REG16, UINT16
+  [ ] sbb MEM8',' UINT8          => 1000_0000, MOD_011_MEM8[, <DISP8 | DISP16>], UINT8
+  [ ] sbb MEM8',' INT8           => 1000_0010, MOD_011_MEM8[, <DISP8 | DISP16>], INT8
+  [ ] sbb MEM16',' UINT16        => 1000_0001, MOD_011_MEM16[, <DISP8 | DISP16>], UINT16
+
+  [ ] sal                        => shl
+  [ ] shl REG8',' CL             => 1101_0010, 11_100_REG8
+  [ ] shl REG16',' CL            => 1101_0011, 11_100_REG16
+  [ ] shl MEM8',' CL             => 1101_0010, MOD_100_MEM8[, <DISP8 | DISP16>]
+  [ ] shl MEM16',' CL            => 1101_0011, MOD_100_MEM16[, <DISP8 | DISP16>]
+  [ ] shl REG8',' UINT8          => 1100_0000, 11_100_REG8, UINT8
+  [ ] shl REG16',' UINT8         => 1100_0001, 11_100_REG16, UINT8
+  [ ] shl MEM8',' UINT8          => 1100_0000, MOD_100_MEM8[, <DISP8 | DISP16>], UINT8
+  [ ] shl MEM16',' UINT8         => 1100_0001, MOD_100_MEM16[, <DISP8 | DISP16>], UINT8
+
+  [ ] shr REG8',' CL             => 1101_0010, 11_101_REG8
+  [ ] shr REG16',' CL            => 1101_0011, 11_101_REG16
+  [ ] shr MEM8',' CL             => 1101_0010, MOD_101_MEM8[, <DISP8 | DISP16>]
+  [ ] shr MEM16',' CL            => 1101_0011, MOD_101_MEM16[, <DISP8 | DISP16>]
+  [ ] shr REG8',' UINT8          => 1100_0000, 11_101_REG8, UINT8
+  [ ] shr REG16',' UINT8         => 1100_0001, 11_101_REG16, UINT8
+  [ ] shr MEM8',' UINT8          => 1100_0000, MOD_101_MEM8[, <DISP8 | DISP16>], UINT8
+  [ ] shr MEM16',' UINT8         => 1100_0001, MOD_101_MEM16[, <DISP8 | DISP16>], UINT8
+
+  [ ] sub DESTREG8',' SRCREG8    => 0010_1000, 11_SRCREG8_DESTREG8
+  [ ] sub DESTREG16',' SRCREG16  => 0010_1001, 11_SRCREG16_DESTREG16
+  [ ] sub REG8',' MEM8           => 0010_1010, MOD_REG8_MEM8[, <DISP8 | DISP16>]
+  [ ] sub REG16',' MEM16         => 0010_1011, MOD_REG16_MEM16[, <DISP8 | DISP16>]
+  [ ] sub MEM8',' REG8           => 0010_1000, MOD_REG8_MEM8[, <DISP8 | DISP16>]
+  [ ] sub MEM16',' REG16         => 0010_1001, MOD_REG16_MEM16[, <DISP8 | DISP16>]
+  [ ] sub REG8',' UINT8          => 1000_0000, 11_101_REG8, UINT8
+  [ ] sub REG8',' INT8           => 1000_0010, 11_101_REG8, INT8
+  [ ] sub REG16',' UINT16        => 1000_0001, 11_101_REG16, UINT16
+  [ ] sub MEM8',' UINT8          => 1000_0000, MOD_101_MEM8[, <DISP8 | DISP16>], UINT8
+  [ ] sub MEM8',' INT8           => 1000_0010, MOD_101_MEM8[, <DISP8 | DISP16>], INT8
+  [ ] sub MEM16',' UINT16        => 1000_0001, MOD_101_MEM16[, <DISP8 | DISP16>], UINT16
+
+  [ ] test DESTREG8',' SRCREG8   => 1000_0100, 11_SRCREG8_DESTREG8
+  [ ] test DESTREG16',' SRCREG16 => 1000_0101, 11_SRCREG16_DESTREG16
+  [ ] test REG8',' MEM8          => 1000_0100, MOD_REG8_MEM8[, <DISP8 | DISP16>]
+  [ ] test REG16',' MEM16        => 1000_0101, MOD_REG8_MEM16[, <DISP8 | DISP16>]
+  [ ] test REG8',' UINT8         => 1111_0110, 11_000_REG8
+  [ ] test REG16',' UINT16       => 1111_0111, 11_000_REG16
+  [ ] test MEM8',' UINT8         => 1111_0110, MOD_000_MEM8[, <DISP8 | DISP16>], UINT8
+  [ ] test MEM16',' UINT16       => 1111_0111, MOD_000_MEM8[, <DISP8 | DISP16>], UINT16
+
+  [ ] xchg DESTREG8',' SRCREG8   => 1000_0110, 11_SRCREG8_DESTREG8
+  [ ] xchg DESTREG16',' SRCREG16 => 1000_0111, 11_SRCREG16_DESTREG16
+  [ ] xchg REG8',' MEM8          => 1000_0110, MOD_REG8_MEM8[, <DISP8 | DISP16>]
+  [ ] xchg REG16',' MEM16        => 1000_0111, MOD_REG16_MEM16[, <DISP8 | DISP16>]
+
+  [ ] xor DESTREG8',' SRCREG8    => 0011_0000, 11_SRCREG8_DESTREG8
+  [ ] xor DESTREG16',' SRCREG16  => 0011_0001, 11_SRCREG16_DESTREG16
+  [ ] xor REG8',' MEM8           => 0011_0010, MOD_REG8_MEM8[, <DISP8 | DISP16>]
+  [ ] xor REG16',' MEM16         => 0011_0011, MOD_REG16_MEM16[, <DISP8 | DISP16>]
+  [ ] xor MEM8',' REG8           => 0011_0000, MOD_REG8_MEM8[, <DISP8 | DISP16>]
+  [ ] xor MEM16',' REG16         => 0011_0001, MOD_REG16_MEM16[, <DISP8 | DISP16>]
+  [ ] xor REG8',' UINT8          => 1000_0000, 11_110_REG8, UINT8
+  [ ] xor REG8',' INT8           => 1000_0010, 11_110_REG8, INT8
+  [ ] xor REG16',' UINT16        => 1000_0001, 11_110_REG16, UINT16
+  [ ] xor MEM8',' UINT8          => 1000_0000, MOD_110_MEM8[, <DISP8 | DISP16>], UINT8
+  [ ] xor MEM8',' INT8           => 1000_0010, MOD_110_MEM8[, <DISP8 | DISP16>], INT8
+  [ ] xor MEM16',' UINT16        => 1000_0001, MOD_110_MEM16[, <DISP8 | DISP16>], UINT16

@@ -64,15 +64,9 @@ x86SingleByteOpTable:
   db 0b1101_0111 ; x86Xlatb
 
 ;
-; func bool x86GenOpReg( uint op, uint reg )
+; func bool x86GenRepOp( uint repToken, uint op )
 ;
-x86GenOpReg:
-  ret 4
-
-;
-; func bool x86GenRepOpReg( uint repToken, uint op )
-;
-x86GenRepOpReg:
+x86GenRepOp:
   ret 4
 
 ;
@@ -129,6 +123,18 @@ x86GenOpImm:
  .Exit:
   mov     sp, bp
   pop     bp
+  ret 6
+
+;
+; func bool x86GenOpReg( uint op, uint reg )
+;
+x86GenOpReg:
+  ret 4
+
+;
+; func bool x86GenOpMem( uint op, uint memRegs, int displacement )
+;
+x86GenOpMem:
   ret 6
 
 ;
@@ -223,12 +229,6 @@ x86GenOpRegImm:
   ret 8
 
 ;
-; func bool x86GenOpRegMem( uint op, uint destReg, @x86MemRef mem )
-;
-x86GenOpRegMem:
-  ret 6
-
-;
 ; func bool x86GenOpRegReg( uint op, uint destReg, uint srcReg )
 ;
 x86GenOpRegReg:
@@ -300,3 +300,24 @@ x86GenOpRegReg:
   mov     sp, bp
   pop     bp
   ret 6
+
+;
+; func bool x86GenOpRegMem( uint op, uint destReg,
+;   uint memRegs, int16 displacement )
+;
+x86GenOpRegMem:
+  ret 8
+
+;
+; func bool x86GenOpMemImm( uint op, uint memRegs, int16 displacement,
+;   uint immType, uint imm )
+;
+x86GenOpMemImm:
+  ret 10
+
+;
+; func bool x86GenOpMemReg( uint op, uint memRegs, int16 displacement,
+;   uint srcReg )
+;
+x86GenOpMemReg:
+  ret 8
