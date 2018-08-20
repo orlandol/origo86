@@ -132,10 +132,129 @@ x86GenOpReg:
   ret 4
 
 ;
-; func bool x86GenOpMem( uint op, uint memRegs, int displacement )
+; func bool x86GenOpMem( uint op, uint memSize,
+;   uint memRegs, int displacement )
 ;
 x86GenOpMem:
-  ret 6
+  push    bp
+  mov     bp, sp
+
+  %define op           bp + 10
+  %define memSize      bp + 8
+  %define memRegs      bp + 6
+  %define displacement bp + 4
+
+  %define instruction  bp - 4
+  push    word 0
+  push    word 0
+
+  mov     bx, [op]
+  mov     si, [memRegs]
+  mov     dx, [displacement]
+  mov     al, 0b00_000_000
+
+  cmp     bx, x86Not
+  jne     .NotNot
+  mov     ah, 0b1111_0110
+  mov     al, 0b00_010_000
+  cmp     word [memSize], 1
+  je      .ProcessRM
+  inc     ah
+  cmp     word [memSize], 2
+  je      .ProcessRM
+  jmp     .Error
+ .NotNot:
+
+ .ProcessRM:
+  test    si, si
+  jnz     .NotDisp16
+  or      al, 0b00_000_110
+ .NotDisp16:
+
+  ; Reserved bits must be 0
+  cmp     si, (mrX86RegBX | mrX86RegBP | mrX86RegSI | mrX86RegDI)
+  ja      .Error
+
+  ; Get ModR/M encoding for MOD 00 as the default
+  or      al, [si + x86RMTable]
+  cmp     al, 0b00_111_000
+  je      .Error
+  test    si, si
+  jz      .Emit
+
+  add     al, 0b01_000_000
+  cmp     al, -128
+  jl      .NotDisp8
+  cmp     al, 127
+  jg      .NotDisp8
+  jmp     .Emit8
+ .NotDisp8:
+
+  add     al, 0b01_000_000
+  jmp     .Emit16
+
+ .Emit:
+xchg ah, al
+  lea     bx, [instruction]
+  mov     [bx + 0], ax
+  mov     cx, 2
+  jmp     .EmitInstruction
+
+ .Emit8:
+xchg ah, al
+  lea     bx, [instruction]
+  mov     [bx + 0], ax
+  mov     [bx + 2], dl
+  mov     cx, 3
+  jmp     .EmitInstruction
+
+ .Emit16:
+xchg ah, al
+  lea     bx, [instruction]
+  mov     [bx + 0], ax
+  mov     [bx + 2], dx
+  mov     cx, 4
+  jmp     .EmitInstruction
+
+ .EmitInstruction:
+  push    cx
+  push    word [binary]
+  push    bx
+  push    cx
+  call    fwrite
+  pop     cx
+
+  cmp     ax, cx
+  je      .Done
+ .Error:
+  xor     ax, ax
+  jmp     .Exit
+ .Done:
+
+  mov     ax, 1
+
+ .Exit:
+  mov     sp, bp
+  pop     bp
+  ret 8
+
+x86RMTable:
+  db 0b00_111_000 ;  0 - Invalid
+  db 0b00_000_101 ;  1 - [DI]
+  db 0b00_000_100 ;  2 - [SI]
+  db 0b00_111_000 ;  3 - Invalid
+  db 0b00_000_110 ;  4 - [BP + <DISP8 | DISP16>] if not [DISP16]
+  db 0b00_000_011 ;  5 - [BP + DI]
+  db 0b00_000_010 ;  6 - [BP + SI]
+  db 0b00_111_000 ;  7 - Invalid
+  db 0b00_000_111 ;  8 - [BX]
+  db 0b00_000_001 ;  9 - [BX + DI]
+  db 0b00_000_000 ; 10 - [BX + SI]
+  db 0b00_111_000 ; 11 - Invalid
+  db 0b00_111_000 ; 12 - Invalid
+  db 0b00_111_000 ; 13 - Invalid
+  db 0b00_111_000 ; 14 - Invalid
+  db 0b00_111_000 ; 15 - Invalid
 
 ;
 ; func bool x86GenOpRegImm( uint op, uint destReg, uint immType, uint imm )
@@ -302,22 +421,22 @@ x86GenOpRegReg:
   ret 6
 
 ;
-; func bool x86GenOpRegMem( uint op, uint destReg,
+; func bool x86GenOpRegMem( uint op, uint destReg, uint memSize,
 ;   uint memRegs, int16 displacement )
 ;
 x86GenOpRegMem:
-  ret 8
-
-;
-; func bool x86GenOpMemImm( uint op, uint memRegs, int16 displacement,
-;   uint immType, uint imm )
-;
-x86GenOpMemImm:
   ret 10
 
 ;
-; func bool x86GenOpMemReg( uint op, uint memRegs, int16 displacement,
-;   uint srcReg )
+; func bool x86GenOpMemImm( uint op, uint memSize,
+;   uint memRegs, int16 displacement, uint immType, uint imm )
+;
+x86GenOpMemImm:
+  ret 12
+
+;
+; func bool x86GenOpMemReg( uint op, uint memSize,
+;   uint memRegs, int16 displacement, uint srcReg )
 ;
 x86GenOpMemReg:
-  ret 8
+  ret 10

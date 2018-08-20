@@ -16,6 +16,12 @@ run:
 
   call    Compile
 
+push x86Not
+push word 1
+push word 0
+push word 10
+call x86GenOpMem
+
   call    Cleanup
 
   mov     sp, bp

@@ -21,6 +21,13 @@
   %define KWITEM_TOKEN    2
   %define KWTABLE_COUNT   ((keywordTableEnd - keywordTable) / SIZEOF_KWITEM)
 
+  ; Memory register flags
+  %define mrX86RegBX  8
+  %define mrX86RegBP  4
+  %define mrX86RegSI  2
+  %define mrX86RegDI  1
+
+  ; Character codes
   %define chSpace     (1 << 0)
   %define chPrint     (1 << 1)
   %define chAlpha     (1 << 2)
