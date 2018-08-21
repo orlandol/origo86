@@ -151,24 +151,27 @@ x86GenOpMem:
   mov     bx, [op]
   mov     si, [memRegs]
   mov     dx, [displacement]
-  mov     al, 0b00_000_000
 
   cmp     bx, x86Not
   jne     .NotNot
-  mov     ah, 0b1111_0110
-  mov     al, 0b00_010_000
+  mov     al, 0b1111_0110
+  mov     ah, 0b00_010_000
   cmp     word [memSize], 1
   je      .ProcessRM
-  inc     ah
+  inc     al
   cmp     word [memSize], 2
   je      .ProcessRM
-  jmp     .Error
+  ;jmp     .Error
  .NotNot:
+
+  xor     ax, ax
+  jmp     .Exit
 
  .ProcessRM:
   test    si, si
   jnz     .NotDisp16
-  or      al, 0b00_000_110
+  or      ah, 0b00_000_110
+  jmp     .Emit16
  .NotDisp16:
 
   ; Reserved bits must be 0
@@ -176,32 +179,31 @@ x86GenOpMem:
   ja      .Error
 
   ; Get ModR/M encoding for MOD 00 as the default
-  or      al, [si + x86RMTable]
-  cmp     al, 0b00_111_000
-  je      .Error
-  test    si, si
+  mov     cl, [si + x86RMTable]
+  cmp     cl, 0b00_111_000
+  jnz     .Error
+  or      ah, cl
+  test    dx, dx
   jz      .Emit
 
-  add     al, 0b01_000_000
-  cmp     al, -128
+  add     ah, 0b01_000_000
+  cmp     dx, -128
   jl      .NotDisp8
-  cmp     al, 127
+  cmp     dx, 127
   jg      .NotDisp8
   jmp     .Emit8
  .NotDisp8:
 
-  add     al, 0b01_000_000
+  add     ah, 0b01_000_000
   jmp     .Emit16
 
  .Emit:
-xchg ah, al
   lea     bx, [instruction]
   mov     [bx + 0], ax
   mov     cx, 2
   jmp     .EmitInstruction
 
  .Emit8:
-xchg ah, al
   lea     bx, [instruction]
   mov     [bx + 0], ax
   mov     [bx + 2], dl
@@ -209,7 +211,6 @@ xchg ah, al
   jmp     .EmitInstruction
 
  .Emit16:
-xchg ah, al
   lea     bx, [instruction]
   mov     [bx + 0], ax
   mov     [bx + 2], dx
