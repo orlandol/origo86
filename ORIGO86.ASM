@@ -16,54 +16,6 @@ run:
 
   call    Compile
 
-push x86Not
-push word 1
-push word 0
-push word 0x12
-call x86GenOpMem
-
-push x86Not
-push word 1
-push word 0
-push word 0x1234
-call x86GenOpMem
-
-push x86Not
-push word 2
-push word 0
-push word 0x12
-call x86GenOpMem
-
-push x86Not
-push word 2
-push word 0
-push word 0x1234
-call x86GenOpMem
-
-push x86Not
-push word 1
-push word mrX86RegBX
-push word 0x12
-call x86GenOpMem
-
-push x86Not
-push word 1
-push word mrX86RegBX
-push word 0x1234
-call x86GenOpMem
-
-push x86Not
-push word 2
-push word mrX86RegBP
-push word 0x12
-call x86GenOpMem
-
-push x86Not
-push word 2
-push word mrX86RegBP
-push word 0x1234
-call x86GenOpMem
-
   call    Cleanup
 
   mov     sp, bp

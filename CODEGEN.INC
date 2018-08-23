@@ -181,10 +181,13 @@ x86GenOpMem:
   ; Get ModR/M encoding for MOD 00 as the default
   mov     cl, [si + x86RMTable]
   cmp     cl, 0b00_111_000
-  jnz     .Error
+  je      .Error
   or      ah, cl
+  cmp     si, mrX86RegBP
+  je      .SkipDisp0
   test    dx, dx
   jz      .Emit
+ .SkipDisp0:
 
   add     ah, 0b01_000_000
   cmp     dx, -128
