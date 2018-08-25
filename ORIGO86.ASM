@@ -16,12 +16,6 @@ run:
 
   call    Compile
 
-push x86Mov
-push x86RegAL
-push word mrX86RegBX
-push word 0
-call x86GenOpRegMem
-
   call    Cleanup
 
   mov     sp, bp
