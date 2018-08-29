@@ -706,6 +706,8 @@
   ---------------------------------------------------------------------------
   x86GenOpMemReg
   ---------------------------------------------------------------------------
+  [ ] mov MEM8',' REG8           => 1000_1000, MOD_REG8_MEM8[, <DISP8 | DISP16>]
+  [ ] mov MEM16',' REG16         => 1000_1001, MOD_REG16_MEM16[, <DISP8 | DISP16>]
 
   ---------------------------------------------------------------------------
   Pending encodings
@@ -853,8 +855,6 @@
 
   [ ] mov DESTREG8',' SRCREG8    => 1000_1000, 11_SRCREG8_DESTREG8
   [ ] mov DESTREG16',' SRCREG16  => 1000_1001, 11_SRCREG16_DESTREG16
-  [ ] mov MEM8',' REG8           => 1000_1000, MOD_REG8_MEM8[, <DISP8 | DISP16>]
-  [ ] mov MEM16',' REG16         => 1000_1001, MOD_REG16_MEM16[, <DISP8 | DISP16>]
   [ ] mov MEM8',' UINT8          => 1100_0110, MOD_000_MEM8[, <DISP8 | DISP16>], UINT8
   [ ] mov MEM16',' UINT16        => 1100_0111, MOD_000_MEM16[, <DISP8 | DISP16>], UINT16
 

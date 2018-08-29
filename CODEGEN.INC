@@ -594,24 +594,119 @@ x86GenOpMemImm:
   ret 12
 
 ;
-; func bool x86GenOpMemReg( uint op, uint memSize,
-;   uint memRegs, int16 displacement, uint srcReg )
+; func bool x86GenOpMemReg( uint op, uint memRegs, int16 displacement,
+;   uint srcReg )
 ;
 x86GenOpMemReg:
   push    bp
   mov     bp, sp
 
-  %define op           bp + 12
-  %define memSize      bp + 10
+  %define op           bp + 10
   %define memRegs      bp + 8
   %define displacement bp + 6
   %define srcReg       bp + 4
 
-  %define instruction  bp - 4
+  %define instruction  bp - 6
   push    word 0
   push    word 0
+  push    word 0
+
+  mov     bx, [op]
+  mov     di, [srcReg]
+  mov     si, [memRegs]
+  mov     dx, [displacement]
+
+  mov     cx, di
+  and     di, maskGroup
+  and     cx, maskSubToken
+  shl     cx, 3
+
+  cmp     bx, x86Mov
+  jne     .NotMov
+  mov     al, 0b1000_1000
+  mov     ah, cl
+  cmp     di, x86Reg8
+  je      .ProcessRM
+
+  inc     al
+  cmp     di, x86Reg16
+  je      .ProcessRM
+ .NotMov:
+
+  xor     ax, ax
+  jmp     .Exit
+
+ .ProcessRM:
+  test    si, si
+  jnz     .NotDisp16
+  or      ah, 0b00_000_110
+  jmp     .Emit16
+ .NotDisp16:
+
+  ; Reserved bits must be 0
+  cmp     si, (mrX86RegBX | mrX86RegBP | mrX86RegSI | mrX86RegDI)
+  ja      .Error
+
+  ; Get ModR/M encoding for MOD 00 as the default
+  mov     cl, [si + x86RMTable]
+  cmp     cl, 0b00_111_000
+  je      .Error
+  or      ah, cl
+  cmp     si, mrX86RegBP
+  je      .SkipDisp0
+  test    dx, dx
+  jz      .Emit
+ .SkipDisp0:
+
+  add     ah, 0b01_000_000
+  cmp     dx, -128
+  jl      .NotDisp8
+  cmp     dx, 127
+  jg      .NotDisp8
+  jmp     .Emit8
+ .NotDisp8:
+
+  add     ah, 0b01_000_000
+  jmp     .Emit16
+
+ .Emit:
+  lea     bx, [instruction]
+  mov     [bx + 0], ax
+  mov     cx, 2
+  jmp     .EmitInstruction
+
+ .Emit8:
+  lea     bx, [instruction]
+  mov     [bx + 0], ax
+  mov     [bx + 2], dl
+  mov     cx, 3
+  jmp     .EmitInstruction
+
+ .Emit16:
+  lea     bx, [instruction]
+  mov     [bx + 0], ax
+  mov     [bx + 2], dx
+  mov     cx, 4
+  jmp     .EmitInstruction
+
+ .EmitInstruction:
+  push    cx
+  push    word [binary]
+  push    bx
+  push    cx
+  call    fwrite
+  pop     cx
+
+  cmp     ax, cx
+  je      .Done
+ .Error:
+  xor     ax, ax
+  jmp     .Exit
+ .Done:
+
+  mov     ax, 1
 
  .Exit:
   mov     sp, bp
   pop     bp
-  ret 10
+  ret 8
