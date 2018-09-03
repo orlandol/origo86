@@ -702,6 +702,8 @@
   ---------------------------------------------------------------------------
   x86GenOpMemImm
   ---------------------------------------------------------------------------
+  [*] mov MEM8',' UINT8          => 1100_0110, MOD_000_MEM8[, <DISP8 | DISP16>], UINT8
+  [*] mov MEM16',' UINT16        => 1100_0111, MOD_000_MEM16[, <DISP8 | DISP16>], UINT16
 
   ---------------------------------------------------------------------------
   x86GenOpMemReg
@@ -855,8 +857,6 @@
 
   [ ] mov DESTREG8',' SRCREG8    => 1000_1000, 11_SRCREG8_DESTREG8
   [ ] mov DESTREG16',' SRCREG16  => 1000_1001, 11_SRCREG16_DESTREG16
-  [ ] mov MEM8',' UINT8          => 1100_0110, MOD_000_MEM8[, <DISP8 | DISP16>], UINT8
-  [ ] mov MEM16',' UINT16        => 1100_0111, MOD_000_MEM16[, <DISP8 | DISP16>], UINT16
 
   [ ] mov SREG',' REG16          => 1000_1110, 11_SREG_REG16
   [ ] mov SREG',' MEM16          => 1000_1110, MOD_SREG_MEM16[, <DISP8 | DISP16>]

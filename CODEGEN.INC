@@ -182,13 +182,13 @@ x86GenOpMem:
   jne     .NotNot
   mov     al, 0b1111_0110
   mov     ah, 0b00_010_000
+ .NotNot:
+
   cmp     word [memSize], 1
   je      .ProcessRM
   inc     al
   cmp     word [memSize], 2
   je      .ProcessRM
-  ;jmp     .Error
- .NotNot:
 
   xor     ax, ax
   jmp     .Exit
@@ -570,28 +570,195 @@ x86GenOpRegMem:
   ret 8
 
 ;
-; func bool x86GenOpMemImm( uint op, uint memSize,
-;   uint memRegs, int16 displacement, uint immType, uint imm )
-;
+; func bool x86GenOpMemImm( uint op, uint memRegs, int16 displacement,
+;   uint immType, uint imm )
+;;;
 x86GenOpMemImm:
   push    bp
   mov     bp, sp
 
-  %define op           bp + 14
-  %define memSize      bp + 12
+  %define op           bp + 12
   %define memRegs      bp + 10
   %define displacement bp + 8
   %define immType      bp + 6
   %define imm          bp + 4
 
-  %define instruction  bp - 4
-  push    word 0
-  push    word 0
+  %define instruction  bp - 6
+  push    word 0x9999
+  push    word 0x9999
+  push    word 0x9999
+
+  ; Registers
+  ; ax = opcode:modRM                   si = memRegs
+  ; bx = op                             di = immType
+  ; cx = instructionSize                dx = displacement; imm
+
+  mov     bx, [op]
+  mov     si, [memRegs]
+  mov     dx, [displacement]
+  mov     di, [immType]
+
+  mov     ax, [imm]
+
+  cmp     di, valInt8
+  jne     .NotInt8
+  cbw
+  jmp     .ImmInitialized
+ .NotInt8:
+
+  cmp     di, valUint8
+  jne     .NotUint8
+  and     ax, 0x00FF
+ .NotUint8:
+
+ .ImmInitialized:
+  mov     [imm], ax
+
+  cmp     bx, x86Mov
+  jne     .NotMov
+  mov     ah, 0           ; ModReg
+  mov     al, 0b1100_0110 ; Opcode
+
+  cmp     di, valInt
+  je      .Mov16
+  cmp     di, valUint
+  je      .Mov16
+  jmp     .ProcessRM
+ .Mov16:
+  inc     al
+  jmp     .ProcessRM
+ .NotMov:
+
+  xor     ax, ax
+  jmp     .Exit
+
+ .ProcessRM:
+  test    si, si
+  jnz     .NotDisp16
+  or      ah, 0b00_000_110
+  jmp     .ProcessDisp16Imm
+ .NotDisp16:
+
+  ; Reserved bits must be 0
+  cmp     si, (mrX86RegBX | mrX86RegBP | mrX86RegSI | mrX86RegDI)
+  ja      .Error
+
+  ; Get ModR/M encoding for MOD 00 as the default
+  mov     cl, [si + x86RMTable]
+  cmp     cl, 0b00_111_000
+  je      .Error
+  or      ah, cl
+  cmp     si, mrX86RegBP
+  je      .SkipDisp0
+  test    dx, dx
+  jz      .ProcessImm
+ .SkipDisp0:
+
+  add     ah, 0b01_000_000
+  cmp     dx, -128
+  jl      .NotDisp8
+  cmp     dx, 127
+  jg      .NotDisp8
+  jmp     .ProcessDisp8Imm
+ .NotDisp8:
+
+  add     ah, 0b01_000_000
+  jmp     .ProcessDisp16Imm
+
+  ; Assume that immediate is validated as either 8-bit or 16-bit
+ .ProcessImm:
+  mov     cx, [imm]
+
+  cmp     di, valInt
+  je      .EmitImm16
+  cmp     di, valUint
+  je      .EmitImm16
+
+ .EmitImm8:
+  lea     bx, [instruction]
+  mov     [bx + 0], ax
+  mov     [bx + 2], cl
+  mov     cx, 3
+  jmp     .EmitInstruction
+
+ .EmitImm16:
+  lea     bx, [instruction]
+  mov     [bx + 0], ax
+  mov     [bx + 2], cx
+  mov     cx, 4
+  jmp     .EmitInstruction
+
+  ; Assume that immediate is validated as either 8-bit or 16-bit
+ .ProcessDisp8Imm:
+  mov     cx, [imm]
+
+  cmp     di, valInt
+  je      .EmitDisp8Imm16
+  cmp     di, valUint
+  je      .EmitDisp8Imm16
+
+ .EmitDisp8Imm8:
+  lea     bx, [instruction]
+  mov     [bx + 0], ax
+  mov     [bx + 2], dl
+  mov     [bx + 3], cl
+  mov     cx, 4
+  jmp     .EmitInstruction
+
+ .EmitDisp8Imm16:
+  lea     bx, [instruction]
+  mov     [bx + 0], ax
+  mov     [bx + 2], dl
+  mov     [bx + 3], cx
+  mov     cx, 5
+  jmp     .EmitInstruction
+
+  ; Assume that immediate is validated as either 8-bit or 16-bit
+ .ProcessDisp16Imm:
+  mov     cx, [imm]
+
+  cmp     di, valInt
+  je      .EmitDisp16Imm16
+  cmp     di, valUint
+  je      .EmitDisp16Imm16
+
+ .EmitDisp16Imm8:
+  lea     bx, [instruction]
+  mov     [bx + 0], ax
+  mov     [bx + 2], dx
+  mov     [bx + 4], cl
+  mov     cx, 5
+  jmp     .EmitInstruction
+
+ .EmitDisp16Imm16:
+  lea     bx, [instruction]
+  mov     [bx + 0], ax
+  mov     [bx + 2], dx
+  mov     [bx + 4], cx
+  mov     cx, 6
+  jmp     .EmitInstruction
+
+ .EmitInstruction:
+  push    cx
+  push    word [binary]
+  push    bx
+  push    cx
+  call    fwrite
+  pop     cx
+
+  cmp     ax, cx
+  je      .Done
+ .Error:
+  xor     ax, ax
+  jmp     .Exit
+ .Done:
+
+  mov     ax, 1
 
  .Exit:
   mov     sp, bp
   pop     bp
-  ret 12
+  ret 10
 
 ;
 ; func bool x86GenOpMemReg( uint op, uint memRegs, int16 displacement,
