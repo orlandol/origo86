@@ -20,7 +20,7 @@ x86GenOp:
   cmp     dx, x86Ident
   jne     .Exit
 
-  cmp     si, 17
+  cmp     si, 19
   ja      .Exit
 
   mov     al, [si + x86SingleByteOpTable]
@@ -54,6 +54,8 @@ x86SingleByteOpTable:
   db 0b1100_1111 ; x86Iret
   db 0b1001_1111 ; x86Lahf
   db 0b1001_0000 ; x86Nop
+  db 0b1001_1101 ; x86Popf
+  db 0b1001_1100 ; x86Pushf
   db 0b1100_0011 ; x86Ret
   db 0b1100_1011 ; x86Retf
   db 0b1001_1110 ; x86Sahf

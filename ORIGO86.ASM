@@ -19,6 +19,66 @@ run:
 
   call    Compile
 
+push word x86Cbw
+call x86GenOp
+
+push word x86Cwd
+call x86GenOp
+
+push word x86Clc
+call x86GenOp
+
+push word x86Cld
+call x86GenOp
+
+push word x86Cli
+call x86GenOp
+
+push word x86Cmc
+call x86GenOp
+
+push word x86Int3
+call x86GenOp
+
+push word x86Iret
+call x86GenOp
+
+push word x86Lahf
+call x86GenOp
+
+push word x86Nop
+call x86GenOp
+
+push word x86Popf
+call x86GenOp
+
+push word x86Pushf
+call x86GenOp
+
+push word x86Ret
+call x86GenOp
+
+push word x86Retf
+call x86GenOp
+
+push word x86Sahf
+call x86GenOp
+
+push word x86Stc
+call x86GenOp
+
+push word x86Std
+call x86GenOp
+
+push word x86Sti
+call x86GenOp
+
+push word x86Xlat
+call x86GenOp
+
+push word x86Xlatb
+call x86GenOp
+
   call    Cleanup
 
   mov     sp, bp
