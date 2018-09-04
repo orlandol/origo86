@@ -3,6 +3,8 @@
 
   int 0x20
 
-  mov cl, [0]
-
-  db 0b1000_1010, 0b00_010_110, 0x34, 0x12
+  rep cmpsb
+  repe cmpsb
+  repne cmpsb
+  repz cmpsb
+  repnz cmpsb

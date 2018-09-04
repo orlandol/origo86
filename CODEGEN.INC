@@ -66,18 +66,125 @@ x86SingleByteOpTable:
   db 0b1101_0111 ; x86Xlatb
 
 ;
-; func bool x86GenRepOp( uint repToken, uint op )
-;
+; func bool x86GenRepOp( uint repOp, uint op )
+;;;
 x86GenRepOp:
   push    bp
   mov     bp, sp
 
-  %define repToken     bp + 6
-  %define op           bp + 4
+  %define repOp bp + 6
+  %define op    bp + 4
 
-  %define instruction  bp - 4
+  %define instruction  bp - 2
   push    word 0
-  push    word 0
+
+  mov     bx, [repOp]
+  mov     si, [op]
+
+  xor     ax, ax
+
+  ; rep op
+  cmp     bx, x86Rep
+  jne     .NotRep
+  mov     al, 0b1111_0011
+
+  mov     ah, 0b1010_1100
+  cmp     si, x86Lodsb
+  je      .Emit
+  inc     ah
+  cmp     si, x86Lodsw
+  je      .Emit
+
+  mov     ah, 0b1010_0100
+  cmp     si, x86Movsb
+  je      .Emit
+  inc     ah
+  cmp     si, x86Movsw
+  je      .Emit
+
+  mov     ah, 0b1010_1010
+  cmp     si, x86Stosb
+  je      .Emit
+  inc     ah
+  cmp     si, x86Stosw
+  je      .Emit
+
+  xor     ax, ax
+  jmp     .Exit
+ .NotRep:
+
+  ; repe/repz op
+  cmp     bx, x86Repe
+  je      .IsRepe
+  cmp     bx, x86Repz
+  jne     .NotRepe
+ .IsRepe:
+  mov     al, 0b1111_0011
+
+  mov     ah, 0b1010_0110
+  cmp     si, x86Cmpsb
+  je      .Emit
+  inc     ah
+  cmp     si, x86Cmpsw
+  je      .Emit
+
+  mov     ah, 0b1010_1110
+  cmp     si, x86Scasb
+  je      .Emit
+  inc     ah
+  cmp     si, x86Scasw
+  je      .Emit
+
+  xor     ax, ax
+  jmp     .Exit
+ .NotRepe:
+
+  ; repne/repnz op
+  cmp     bx, x86Repne
+  je      .IsRepne
+  cmp     bx, x86Repnz
+  jne     .NotRepne
+ .IsRepne:
+  mov     al, 0b1111_0010
+
+  mov     ah, 0b1010_0110
+  cmp     si, x86Cmpsb
+  je      .Emit
+  inc     ah
+  cmp     si, x86Cmpsw
+  je      .Emit
+
+  mov     ah, 0b1010_1110
+  cmp     si, x86Scasb
+  je      .Emit
+  inc     ah
+  cmp     si, x86Scasw
+  je      .Emit
+
+  xor     ax, ax
+  jmp     .Exit
+ .NotRepne:
+
+ .Emit:
+  lea     bx, [instruction]
+  mov     [bx + 0], ax
+  mov     cx, 2
+
+ .EmitInstruction:
+  push    cx
+  push    word [binary]
+  push    bx
+  push    cx
+  call    fwrite
+  pop     cx
+
+  cmp     ax, cx
+  je      .Done
+  xor     ax, ax
+  jmp     .Exit
+ .Done:
+
+  mov     ax, 1
 
  .Exit:
   mov     sp, bp
@@ -150,9 +257,52 @@ x86GenOpReg:
   %define op           bp + 6
   %define reg          bp + 4
 
-  %define instruction  bp - 4
+  %define instruction  bp - 2
   push    word 0
-  push    word 0
+
+  mov     bx, [op]
+  mov     si, [reg]
+
+  mov     cx, si
+  and     si, maskGroup
+  and     cx, maskSubToken
+
+  cmp     bx, x86Not
+  jne     .NotNot
+  mov     ah, 0b11_010_000
+  add     ah, cl
+  mov     al, 0b1111_0110
+ .NotNot:
+
+  cmp     si, x86Reg8
+  je      .Emit
+  inc     al
+  cmp     si, x86Reg16
+  je      .Emit
+
+  xor     ax, ax
+  jmp     .Exit
+
+ .Emit:
+  lea     bx, [instruction]
+  mov     [bx + 0], ax
+  mov     cx, 2
+
+ .EmitInstruction:
+  push    cx
+  push    word [binary]
+  push    bx
+  push    cx
+  call    fwrite
+  pop     cx
+
+  cmp     ax, cx
+  je      .Done
+  xor     ax, ax
+  jmp     .Exit
+ .Done:
+
+  mov     ax, 1
 
  .Exit:
   mov     sp, bp
@@ -324,13 +474,14 @@ x86GenOpRegImm:
 
   mov     dx, ax
 
-  mov     ax, si
+  mov     cx, si
   and     si, maskGroup
-  and     ax, maskSubToken
+  and     cx, maskSubToken
 
   cmp     bx, x86Mov
   jne     .NotMov
-  add     ah, 0b11_000_000 ; ModReg
+  mov     ah, 0b11_000_000 ; ModReg
+  add     ah, cl
   mov     al, 0b1100_0110 ; Opcode
  .NotMov:
 
@@ -356,7 +507,6 @@ x86GenOpRegImm:
   mov     [bx + 0], ax
   mov     [bx + 2], dx
   mov     cx, 4
-  ;jmp     .EmitInstruction
 
  .EmitInstruction:
   push    cx
@@ -574,7 +724,7 @@ x86GenOpRegMem:
 ;
 ; func bool x86GenOpMemImm( uint op, uint memRegs, int16 displacement,
 ;   uint immType, uint imm )
-;;;
+;
 x86GenOpMemImm:
   push    bp
   mov     bp, sp
