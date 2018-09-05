@@ -67,7 +67,7 @@ x86SingleByteOpTable:
 
 ;
 ; func bool x86GenRepOp( uint repOp, uint op )
-;;;
+;
 x86GenRepOp:
   push    bp
   mov     bp, sp
@@ -248,7 +248,64 @@ x86GenOpImm:
   ret 6
 
 ;
-; func bool x86GenOpReg( uint op, uint reg )
+; func bool x86GenOpSelOfs( uint op, sel, ofs )
+;;;
+x86GenOpSelOfs:
+  push    bp
+  mov     bp, sp
+
+  %define op           bp + 8
+  %define sel          bp + 6
+  %define ofs          bp + 4
+
+  %define instruction  bp - 6
+  push    word 0
+  push    word 0
+  push    word 0
+
+  mov     bx, [op]
+  mov     si, [sel]
+  mov     di, [ofs]
+
+  cmp     bx, x86Call
+  jne     .NotCall
+  mov     al, 0b1001_1010
+  jmp     .Emit
+ .NotCall:
+
+  xor     ax, ax
+  jmp     .Exit
+
+ .Emit:
+  lea     bx, [instruction]
+  mov     [bx + 0], al
+  mov     [bx + 1], di
+  mov     [bx + 3], si
+  mov     cx, 5
+
+ .EmitInstruction:
+  push    cx
+  push    word [binary]
+  push    bx
+  push    cx
+  call    fwrite
+  pop     cx
+
+  cmp     ax, cx
+  je      .Done
+  xor     ax, ax
+  jmp     .Exit
+ .Done:
+
+  mov     ax, 1
+
+ .Exit:
+  mov     sp, bp
+  pop     bp
+  ret 6
+
+;
+; func bool x86GenOpReg( uint op, reg )
 ;
 x86GenOpReg:
   push    bp
@@ -267,11 +324,22 @@ x86GenOpReg:
   and     si, maskGroup
   and     cx, maskSubToken
 
-  cmp     bx, x86Not
-  jne     .NotNot
+  cmp     bx, x86Call
+  jne     .NotCall
+  mov     al, 0b1111_1111
   mov     ah, 0b11_010_000
   add     ah, cl
+  cmp     si, x86Reg16
+  je      .Emit
+  xor     ax, ax
+  jmp     .Exit
+ .NotCall:
+
+  cmp     bx, x86Not
+  jne     .NotNot
   mov     al, 0b1111_0110
+  mov     ah, 0b11_010_000
+  add     ah, cl
  .NotNot:
 
   cmp     si, x86Reg8

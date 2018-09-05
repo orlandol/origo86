@@ -19,93 +19,10 @@ run:
 
   call    Compile
 
-push word x86Rep
-push word x86Lodsb
-call x86GenRepOp
-
-push word x86Rep
-push word x86Lodsw
-call x86GenRepOp
-
-push word x86Rep
-push word x86Movsb
-call x86GenRepOp
-
-push word x86Rep
-push word x86Movsw
-call x86GenRepOp
-
-push word x86Rep
-push word x86Stosb
-call x86GenRepOp
-
-push word x86Rep
-push word x86Stosw
-call x86GenRepOp
-
-push word x86Repe
-push word x86Cmpsb
-call x86GenRepOp
-
-push word x86Repe
-push word x86Cmpsw
-call x86GenRepOp
-
-push word x86Repe
-push word x86Scasb
-call x86GenRepOp
-
-push word x86Repe
-push word x86Scasw
-call x86GenRepOp
-
-push word x86Repne
-push word x86Cmpsb
-call x86GenRepOp
-
-push word x86Repne
-push word x86Cmpsw
-call x86GenRepOp
-
-push word x86Repne
-push word x86Scasb
-call x86GenRepOp
-
-push word x86Repne
-push word x86Scasw
-call x86GenRepOp
-
-push word x86Repz
-push word x86Cmpsb
-call x86GenRepOp
-
-push word x86Repz
-push word x86Cmpsw
-call x86GenRepOp
-
-push word x86Repz
-push word x86Scasb
-call x86GenRepOp
-
-push word x86Repz
-push word x86Scasw
-call x86GenRepOp
-
-push word x86Repnz
-push word x86Cmpsb
-call x86GenRepOp
-
-push word x86Repnz
-push word x86Cmpsw
-call x86GenRepOp
-
-push word x86Repnz
-push word x86Scasb
-call x86GenRepOp
-
-push word x86Repnz
-push word x86Scasw
-call x86GenRepOp
+push word x86Call
+push word 0x1234
+push word 0xABCD
+call x86GenOpSelOfs
 
   call    Cleanup
 
