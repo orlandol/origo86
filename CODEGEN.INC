@@ -210,11 +210,34 @@ x86GenOpImm:
   mov     di, [immType]
   mov     dx, [imm]
 
+  ;;; TODO: Sign/Zero extend 8-bit values
+
   cmp     bx, x86Int
   jne     .NotX86Int
   mov     al, 0b1100_1101
   jmp     .Emit8
  .NotX86Int:
+
+  cmp     bx, x86JCC
+  jb      .NotJcc
+  cmp     bx, x86JCC + 16
+  ja      .NotJcc
+  mov     ax, bx
+  sub     ax, x86JCC
+  cmp     di, valInt8
+  je      .Emit8
+  cmp     di, valUint8
+  je      .Emit8
+  mov     ah, al
+  add     ah, 0b0111_0000
+  mov     al, 0b0000_1111
+  cmp     di, valInt
+  je      .EmitOp16Imm16
+  cmp     di, valUint
+  je      .EmitOp16Imm16
+  xor     ax, ax
+  jmp     .Exit
+ .NotJcc:
 
   xor     ax, ax
   jmp     .Exit
@@ -224,7 +247,14 @@ x86GenOpImm:
   mov     [bx + 0], al
   mov     [bx + 1], dl
   mov     cx, 2
-  ;jmp     .EmitInstruction
+  jmp     .EmitInstruction
+
+ .EmitOp16Imm16:
+  lea     bx, [instruction]
+  mov     [bx + 0], ax
+  mov     [bx + 1], dx
+  mov     cx, 4
+  jmp     .EmitInstruction
 
  .EmitInstruction:
   push    cx

@@ -240,25 +240,37 @@
   %define x86Inc    (x86Ident + 30)
   %define x86Int    (x86Ident + 31)
 
-  ;;; TODO: Define conditions that won't be used
-  ;;; TODO: Define aliases for actual mneumonics
  %define x86JCC    (x86Ident + 32)
-  %define x86Jb     (x86Ident + 32)
-  %define x86Jc     (x86Ident + 33)
-  %define x86Jae    (x86Ident + 34)
-  %define x86Jnc    (x86Ident + 35)
+  %define x86Jo     (x86Ident + 32)
+  %define x86Jno    (x86Ident + 33)
+  %define x86Jb     (x86Ident + 34)
+  %define x86Jc     x86Jb
+  %define x86Jnae   x86Jb
+  %define x86Jnb    (x86Ident + 35)
+  %define x86Jnc    x86Jnb
+  %define x86Jae    x86Jnb
   %define x86Je     (x86Ident + 36)
-  %define x86Jz     (x86Ident + 37)
-  %define x86Jne    (x86Ident + 38)
-  %define x86Jnz    (x86Ident + 39)
-  %define x86Jbe    (x86Ident + 40)
-  %define x86Ja     (x86Ident + 41)
-  %define x86Js     (x86Ident + 42)
-  %define x86Jns    (x86Ident + 43)
+  %define x86Jz     x86Je
+  %define x86Jne    (x86Ident + 37)
+  %define x86Jnz    x86Jne
+  %define x86Jbe    (x86Ident + 38)
+  %define x86Jna    x86Jbe
+  %define x86Jnbe   (x86Ident + 39)
+  %define x86Ja     x86Jnbe
+  %define x86Js     (x86Ident + 40)
+  %define x86Jns    (x86Ident + 41)
+  %define x86Jp     (x86Ident + 42)
+  %define x86Jpe    x86Jp
+  %define x86Jnp    (x86Ident + 43)
+  %define x86Jpo    x86Jnp
   %define x86Jl     (x86Ident + 44)
-  %define x86Jge    (x86Ident + 45)
+  %define x86Jnge   x86Jl
+  %define x86Jnl    (x86Ident + 45)
+  %define x86Jge    x86Jnl
   %define x86Jle    (x86Ident + 46)
-  %define x86Jg     (x86Ident + 47)
+  %define x86Jng    x86Jle
+  %define x86Jnle   (x86Ident + 47)
+  %define x86Jg     x86Jnle
 
   %define x86Rep    (x86Ident + 48)
   %define x86Repe   (x86Ident + 49)

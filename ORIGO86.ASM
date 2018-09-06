@@ -19,15 +19,157 @@ run:
 
   call    Compile
 
-push word x86Call
-push word 0x1234
-push word 0xABCD
-call x86GenOpSelOfs
+;;; Test valUint8, valInt8, valUint, ValInt
 
-push word x86Jmp
-push word 0x1234
-push word 0xABCD
-call x86GenOpSelOfs
+push word x86Jo
+push word valUint8
+push word 0x12
+call x86GenOpImm
+
+push word x86Jno
+push word valUint8
+push word 0x12
+call x86GenOpImm
+
+push word x86Jb
+push word valUint8
+push word 0x12
+call x86GenOpImm
+
+push word x86Jc
+push word valUint8
+push word 0x12
+call x86GenOpImm
+
+push word x86Jnae
+push word valUint8
+push word 0x12
+call x86GenOpImm
+
+push word x86Jnb
+push word valUint8
+push word 0x12
+call x86GenOpImm
+
+push word x86Jnc
+push word valUint8
+push word 0x12
+call x86GenOpImm
+
+push word x86Jae
+push word valUint8
+push word 0x12
+call x86GenOpImm
+
+push word x86Je
+push word valUint8
+push word 0x12
+call x86GenOpImm
+
+push word x86Jz
+push word valUint8
+push word 0x12
+call x86GenOpImm
+
+push word x86Jne
+push word valUint8
+push word 0x12
+call x86GenOpImm
+
+push word x86Jnz
+push word valUint8
+push word 0x12
+call x86GenOpImm
+
+push word x86Jbe
+push word valUint8
+push word 0x12
+call x86GenOpImm
+
+push word x86Jna
+push word valUint8
+push word 0x12
+call x86GenOpImm
+
+push word x86Jnbe
+push word valUint8
+push word 0x12
+call x86GenOpImm
+
+push word x86Ja
+push word valUint8
+push word 0x12
+call x86GenOpImm
+
+push word x86Js
+push word valUint8
+push word 0x12
+call x86GenOpImm
+
+push word x86Jns
+push word valUint8
+push word 0x12
+call x86GenOpImm
+
+push word x86Jp
+push word valUint8
+push word 0x12
+call x86GenOpImm
+
+push word x86Jpe
+push word valUint8
+push word 0x12
+call x86GenOpImm
+
+push word x86Jnp
+push word valUint8
+push word 0x12
+call x86GenOpImm
+
+push word x86Jpo
+push word valUint8
+push word 0x12
+call x86GenOpImm
+
+push word x86Jl
+push word valUint8
+push word 0x12
+call x86GenOpImm
+
+push word x86Jnge
+push word valUint8
+push word 0x12
+call x86GenOpImm
+
+push word x86Jnl
+push word valUint8
+push word 0x12
+call x86GenOpImm
+
+push word x86Jge
+push word valUint8
+push word 0x12
+call x86GenOpImm
+
+push word x86Jle
+push word valUint8
+push word 0x12
+call x86GenOpImm
+
+push word x86Jng
+push word valUint8
+push word 0x12
+call x86GenOpImm
+
+push word x86Jnle
+push word valUint8
+push word 0x12
+call x86GenOpImm
+
+push word x86Jg
+push word valUint8
+push word 0x12
+call x86GenOpImm
 
   call    Cleanup
 
