@@ -22,7 +22,8 @@
                        14) Loop Statements
                        15) Assembler Statements
                        16) x86 16-Bit ModR/M Format
-                       17) x86 Instruction Encodings for x86GenXYZ
+                       17) x86 Condition Test Encoding
+                       18) x86 Instruction Encodings for x86GenXYZ
                                       --
 
                           1) Introduction
@@ -493,7 +494,7 @@
     [...]
   endfor
 
-  [STATEMENT] until CONDITION
+  STATEMENT [until CONDITION]
                                       --
 
                        15) x86 Assembler Instructions
@@ -632,7 +633,42 @@
   DI                  => 11_REG_111
                                         --
 
-                  17) x86 Instruction Encodings for x86GenXYZ
+                        17) x86 Condition Test Encoding
+
+  This section based on Table B-10 Condition Test (tttn) Field
+    from the Intel 64 and IA-32 Architectures Software Developer's Manual
+
+    O (Overflow)                     => 0000
+   NO (No overflow)                  => 0001
+    B (Below)                        => 0010
+  NAE (Not above or equal)           => B
+   NB (Not below)                    => 0011
+   AE (Above or equal)               => NB
+    E (Equal)                        => 0100
+    Z (Zero)                         => E
+   NE (Not equal)                    => 0101
+   NZ (Not zero)                     => NE
+   BE (Below or equal)               => 0110
+   NA (Not above)                    => BE
+  NBE (Not below or equal)           => 0111
+    A (Above)                        => NBE
+    S (Sign)                         => 1000
+   NS (Not sign)                     => 1001
+    P (Parity)                       => 1010
+   PE (Parity even)                  => P
+   NP (Not parity)                   => 1011
+   PO (Parity odd)                   => NP
+    L (Less than)                    => 1100
+  NGE (Not greater than or equal to) => L
+   NL (Not less than)                => 1101
+   GE (Greater than or equal to)     => NL
+   LE (Less than or equal to)        => 1110
+   NG (Not greater than)             => LE
+  NLE (Not less than or equal to)    => 1111
+    G (Greater than)                 => NLE
+                                        --
+
+                  18) x86 Instruction Encodings for x86GenXYZ
 
   Instruction encodings based on Section B.2 General-Purpose Instruction
     Formats and Encodings For Non-64-Bit Modes.
@@ -699,6 +735,7 @@
   x86GenOpSelOfs
   ---------------------------------------------------------------------------
   [*] call SEL16':'OFS16         => 1001_1010, OFS16, SEL16
+  [*] jmp SEL16':'OFS16          => 1110_1010, OFS16, SEL16
 
   ---------------------------------------------------------------------------
   x86GenOpReg
@@ -871,7 +908,6 @@
   [ ] jmp REG16                  => 1111_1111, 11_100_REG16
   [ ] jmp [near] MEM16           => 1111_1111, MOD_100_MEM16[, <DISP8 | DISP16>]
 
-  [ ] jmp SEL16':'OFS16          => 1001_1010, OFS16, SEL16
   [ ] jmp MEM32                  => 1111_1111, MOD_101_MEM32[, <DISP8 | DISP16>]
 
   [ ] lds REG16',' MEM32         => 1100_0101, MODab_REG16_MEM32

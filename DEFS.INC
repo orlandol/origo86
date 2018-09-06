@@ -240,6 +240,9 @@
   %define x86Inc    (x86Ident + 30)
   %define x86Int    (x86Ident + 31)
 
+  ;;; TODO: Define conditions that won't be used
+  ;;; TODO: Define aliases for actual mneumonics
+ %define x86JCC    (x86Ident + 32)
   %define x86Jb     (x86Ident + 32)
   %define x86Jc     (x86Ident + 33)
   %define x86Jae    (x86Ident + 34)

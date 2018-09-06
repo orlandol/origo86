@@ -3,8 +3,19 @@
 
   int 0x20
 
-  rep cmpsb
-  repe cmpsb
-  repne cmpsb
-  repz cmpsb
-  repnz cmpsb
+  db 0b0111_0000, 0x12
+  db 0b0111_0001, 0x12
+  db 0b0111_0010, 0x12
+  db 0b0111_0011, 0x12
+  db 0b0111_0100, 0x12
+  db 0b0111_0101, 0x12
+  db 0b0111_0110, 0x12
+  db 0b0111_0111, 0x12
+  db 0b0111_1000, 0x12
+  db 0b0111_1001, 0x12
+  db 0b0111_1010, 0x12
+  db 0b0111_1011, 0x12
+  db 0b0111_1100, 0x12
+  db 0b0111_1101, 0x12
+  db 0b0111_1110, 0x12
+  db 0b0111_1111, 0x12

@@ -249,7 +249,7 @@ x86GenOpImm:
 
 ;
 ; func bool x86GenOpSelOfs( uint op, sel, ofs )
-;;;
+;
 x86GenOpSelOfs:
   push    bp
   mov     bp, sp
@@ -272,6 +272,12 @@ x86GenOpSelOfs:
   mov     al, 0b1001_1010
   jmp     .Emit
  .NotCall:
+
+  cmp     bx, x86Jmp
+  jne     .NotJmp
+  mov     al, 0b1110_1010
+  jmp     .Emit
+ .NotJmp:
 
   xor     ax, ax
   jmp     .Exit

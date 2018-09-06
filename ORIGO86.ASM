@@ -24,6 +24,11 @@ push word 0x1234
 push word 0xABCD
 call x86GenOpSelOfs
 
+push word x86Jmp
+push word 0x1234
+push word 0xABCD
+call x86GenOpSelOfs
+
   call    Cleanup
 
   mov     sp, bp
