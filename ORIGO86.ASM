@@ -19,155 +19,29 @@ run:
 
   call    Compile
 
-push word x86Jo
-push word valUint
-push word 0x1234
-call x86GenOpImm
+push word x86Mov
+push word x86SRegES
+push word mrX86RegBX | mrX86RegSI
+push word 0x12
+call x86GenOpRegMem
 
-push word x86Jno
-push word valUint
+push word x86Mov
+push word x86SRegCS
+push word mrX86RegBX | mrX86RegSI
 push word 0x1234
-call x86GenOpImm
+call x86GenOpRegMem
 
-push word x86Jb
-push word valUint
-push word 0x1234
-call x86GenOpImm
+push word x86Mov
+push word x86SRegSS
+push word mrX86RegBX | mrX86RegSI
+push word 0x12
+call x86GenOpRegMem
 
-push word x86Jc
-push word valUint
+push word x86Mov
+push word x86SRegDS
+push word mrX86RegBX | mrX86RegSI
 push word 0x1234
-call x86GenOpImm
-
-push word x86Jnae
-push word valUint
-push word 0x1234
-call x86GenOpImm
-
-push word x86Jnb
-push word valUint
-push word 0x1234
-call x86GenOpImm
-
-push word x86Jnc
-push word valUint
-push word 0x1234
-call x86GenOpImm
-
-push word x86Jae
-push word valUint
-push word 0x1234
-call x86GenOpImm
-
-push word x86Je
-push word valUint
-push word 0x1234
-call x86GenOpImm
-
-push word x86Jz
-push word valUint
-push word 0x1234
-call x86GenOpImm
-
-push word x86Jne
-push word valUint
-push word 0x1234
-call x86GenOpImm
-
-push word x86Jnz
-push word valUint
-push word 0x1234
-call x86GenOpImm
-
-push word x86Jbe
-push word valUint
-push word 0x1234
-call x86GenOpImm
-
-push word x86Jna
-push word valUint
-push word 0x1234
-call x86GenOpImm
-
-push word x86Jnbe
-push word valUint
-push word 0x1234
-call x86GenOpImm
-
-push word x86Ja
-push word valUint
-push word 0x1234
-call x86GenOpImm
-
-push word x86Js
-push word valUint
-push word 0x1234
-call x86GenOpImm
-
-push word x86Jns
-push word valUint
-push word 0x1234
-call x86GenOpImm
-
-push word x86Jp
-push word valUint
-push word 0x1234
-call x86GenOpImm
-
-push word x86Jpe
-push word valUint
-push word 0x1234
-call x86GenOpImm
-
-push word x86Jnp
-push word valUint
-push word 0x1234
-call x86GenOpImm
-
-push word x86Jpo
-push word valUint
-push word 0x1234
-call x86GenOpImm
-
-push word x86Jl
-push word valUint
-push word 0x1234
-call x86GenOpImm
-
-push word x86Jnge
-push word valUint
-push word 0x1234
-call x86GenOpImm
-
-push word x86Jnl
-push word valUint
-push word 0x1234
-call x86GenOpImm
-
-push word x86Jge
-push word valUint
-push word 0x1234
-call x86GenOpImm
-
-push word x86Jle
-push word valUint
-push word 0x1234
-call x86GenOpImm
-
-push word x86Jng
-push word valUint
-push word 0x1234
-call x86GenOpImm
-
-push word x86Jnle
-push word valUint
-push word 0x1234
-call x86GenOpImm
-
-push word x86Jg
-push word valUint
-push word 0x1234
-call x86GenOpImm
+call x86GenOpRegMem
 
   call    Cleanup
 

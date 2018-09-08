@@ -724,7 +724,7 @@ x86GenOpRegReg:
 ;
 ; func bool x86GenOpRegMem( uint op, uint destReg,
 ;   uint memRegs, int16 displacement )
-;
+;;;
 x86GenOpRegMem:
   push    bp
   mov     bp, sp
@@ -747,21 +747,111 @@ x86GenOpRegMem:
   mov     cx, di
   and     di, maskGroup
   and     cx, maskSubToken
-  shl     cx, 3
 
   cmp     bx, x86Mov
   jne     .NotMov
-  mov     al, 0b1000_1010
-  or      cl, 0b00_000_000
+  cmp     di, x86SReg
+  jne     .NotMovSReg
+  mov     al, 0b1000_1110
+  shl     cl, 3
   mov     ah, cl
+  jmp     .ProcessRM
+ .NotMovSReg:
+  mov     al, 0b1000_1010
+  shl     cl, 3
+  mov     ah, cl
+  jmp     .ProcessDest
+ .NotMov:
+
+  cmp     bx, x86Adc
+  jne     .NotAdc
+  mov     al, 0b0001_0010
+  shl     cl, 3
+  mov     ah, cl
+  jmp     .ProcessDest
+ .NotAdc:
+
+  cmp     bx, x86Add
+  jne     .NotAdd
+  mov     al, 0b0000_0010
+  shl     cl, 3
+  mov     ah, cl
+  jmp     .ProcessDest
+ .NotAdd:
+
+  cmp     bx, x86And
+  jne     .NotAnd
+  mov     al, 0b0010_0010
+  shl     cl, 3
+  mov     ah, cl
+  jmp     .ProcessDest
+ .NotAnd:
+
+  cmp     bx, x86Cmp
+  jne     .NotCmp
+  mov     al, 0b0011_1000
+  shl     cl, 3
+  mov     ah, cl
+  jmp     .ProcessDest
+ .NotCmp:
+
+  cmp     bx, x86Or
+  jne     .NotOr
+  mov     al, 0b0000_1010
+  shl     cl, 3
+  mov     ah, cl
+  jmp     .ProcessDest
+ .NotOr:
+
+  cmp     bx, x86Sbb
+  jne     .NotSbb
+  mov     al, 0b0001_1010
+  shl     cl, 3
+  mov     ah, cl
+  jmp     .ProcessDest
+ .NotSbb:
+
+  cmp     bx, x86Sub
+  jne     .NotSub
+  mov     al, 0b0010_1010
+  shl     cl, 3
+  mov     ah, cl
+  jmp     .ProcessDest
+ .NotSub:
+
+  cmp     bx, x86Test
+  jne     .NotTest
+  mov     al, 0b1000_0100
+  shl     cl, 3
+  mov     ah, cl
+  jmp     .ProcessDest
+ .NotTest:
+
+  cmp     bx, x86Xchg
+  jne     .NotXchg
+  mov     al, 0b1000_0110
+  shl     cl, 3
+  mov     ah, cl
+  jmp     .ProcessDest
+ .NotXchg:
+
+  cmp     bx, x86Xor
+  jne     .NotXor
+  mov     al, 0b0011_0010
+  shl     cl, 3
+  mov     ah, cl
+  jmp     .ProcessDest
+ .NotXor:
+
+  xor     ax, ax
+  jmp     .Exit
+
+ .ProcessDest:
   cmp     di, x86Reg8
   je      .ProcessRM
-
   inc     al
   cmp     di, x86Reg16
   je      .ProcessRM
- .NotMov:
-
   xor     ax, ax
   jmp     .Exit
 
