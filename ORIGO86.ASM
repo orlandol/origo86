@@ -20,28 +20,28 @@ run:
   call    Compile
 
 push word x86Mov
+push word mrX86RegBX | mrX86RegSI
+push word 0x12
 push word x86SRegES
-push word mrX86RegBX | mrX86RegSI
-push word 0x12
-call x86GenOpRegMem
+call x86GenOpMemReg
 
 push word x86Mov
+push word mrX86RegBX | mrX86RegSI
+push word 0x1234
 push word x86SRegCS
-push word mrX86RegBX | mrX86RegSI
-push word 0x1234
-call x86GenOpRegMem
+call x86GenOpMemReg
 
 push word x86Mov
-push word x86SRegSS
 push word mrX86RegBX | mrX86RegSI
 push word 0x12
-call x86GenOpRegMem
+push word x86SRegSS
+call x86GenOpMemReg
 
 push word x86Mov
-push word x86SRegDS
 push word mrX86RegBX | mrX86RegSI
 push word 0x1234
-call x86GenOpRegMem
+push word x86SRegDS
+call x86GenOpMemReg
 
   call    Cleanup
 
@@ -58,15 +58,88 @@ ParseOptions:
   push    bp
   mov     bp, sp
 
+  %define extOfs bp - 2
+  push    word 0
+
   ; Validate parameter count
-  cmp     word [argc], 1
-  je      .SkipUsage
+  cmp     word [argc], 0
+  ja      .SkipUsage
   push    eoln
   call    echostring
   call    PrintUsage
   mov     ax, 0x4C00
   int     0x21
  .SkipUsage:
+
+  ; Parse source name
+  mov     si, [arg + 0];2]
+  mov     di, srcName
+  xor     cx, cx
+
+ .ParseSourceName:
+  mov     al, [si]
+  inc     si
+  test    al, al
+  jz      .DoneSourceName
+  inc     cx
+  mov     [di], al
+  cmp     al, '.'
+  jne     .SrcSkipDot
+  mov     [extOfs], di
+ .SrcSkipDot:
+  inc     di
+  jmp     .ParseSourceName
+ .DoneSourceName:
+  mov     byte [di], 0
+
+  mov     di, [extOfs]
+  test    di, di
+  jnz     .SrcExtSpecified
+  add     cx, srcName
+  mov     di, cx
+  mov     byte [di + 0], '.'
+  mov     byte [di + 1], 'r'
+  mov     byte [di + 2], 'e'
+  mov     byte [di + 3], 't'
+ .SrcExtSpecified:
+
+  ; Parse binary name
+  mov     si, srcName
+  cmp     word [argc], 1
+  jbe     .BinNameFromSrc
+  mov     si, [arg + 2];4]
+ .BinNameFromSrc:
+  mov     di, binName
+  xor     cx, cx
+
+ .ParseBinaryName:
+  mov     al, [si]
+  inc     si
+  test    al, al
+  jz      .DoneBinaryName
+  inc     cx
+  mov     [di], al
+  cmp     al, '.'
+  jne     .BinSkipDot
+  mov     [extOfs], di
+ .BinSkipDot:
+  inc     di
+  jmp     .ParseBinaryName
+ .DoneBinaryName:
+
+  cmp     word [argc], 1
+  ja      .BinExtSpecified
+  mov     di, [extOfs]
+  test    di, di
+  jne     .ModifyBinExt
+  add     cx, binName
+  mov     di, cx
+ .ModifyBinExt:
+  mov     byte [di + 0], '.'
+  mov     byte [di + 1], 'c'
+  mov     byte [di + 2], 'o'
+  mov     byte [di + 3], 'm'
+ .BinExtSpecified:
 
  .Exit:
   mov     sp, bp
@@ -107,7 +180,7 @@ PrintUsage:
 OpenRet:
   call    CloseRet
 
-  push    word [arg + 0]
+  push    srcName
   call    fopen
   mov     [source], ax
 
@@ -147,7 +220,7 @@ CloseRet:
 CreateBinary:
   call    CloseBinary
 
-  push    binaryName
+  push    binName
   call    fcreate
   mov     [binary], ax
   ret
@@ -260,6 +333,9 @@ strStatement:     db '',0
 lineStr: db 'line: ', 0
 colStr:  db 'col:  ', 0
 
+srcName: times 128 + 4 + 1 db 0
+binName: times 128 + 4 + 1 db 0
+
 line:     dw 1
 col:      dw 1
 
@@ -268,8 +344,6 @@ curCol:   dw 1
 
 nextLine: dw 1
 nextCol:  dw 1
-
-binaryName: db "program.com",0
 
 source: dw 0
 binary: dw 0

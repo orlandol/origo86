@@ -379,8 +379,10 @@
   xor     ax, ax
   rep stosw
 
+  ;;; TODO: Fill argexe
+
   ; Initialize command-line arguments
-  mov     bx, arg
+  mov     bx, arg ; + 2
   mov     si, 129
   mov     di, argstr
   xor     cx, cx

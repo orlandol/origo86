@@ -507,7 +507,8 @@ minMemString:     db 'Error: Need 64K to run.',13,10,13,10,0
 eoln: db 13,10,0
 
 argc:   dw 0
-arg:    times 127 dw 0
+arg:    times 128 dw 0
+argexe: times 128 db 0 ;;; TODO: Fill this, and make it arg[0]
 argstr: times 128 db 0
 
 maxAvail: dw 0
