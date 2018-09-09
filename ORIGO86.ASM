@@ -1,4 +1,4 @@
-
+ 
   ORG 0x100
 
   %include "defs.inc"
@@ -19,29 +19,25 @@ run:
 
   call    Compile
 
-push word x86Mov
-push word mrX86RegBX | mrX86RegSI
-push word 0x12
-push word x86SRegES
-call x86GenOpMemReg
+push word x86Retf
+push word valUint8
+push word 0
+call x86GenOpImm
 
-push word x86Mov
-push word mrX86RegBX | mrX86RegSI
+push word x86Retf
+push word valInt8
+push word 0
+call x86GenOpImm
+
+push word x86Retf
+push word valUint
 push word 0x1234
-push word x86SRegCS
-call x86GenOpMemReg
+call x86GenOpImm
 
-push word x86Mov
-push word mrX86RegBX | mrX86RegSI
-push word 0x12
-push word x86SRegSS
-call x86GenOpMemReg
-
-push word x86Mov
-push word mrX86RegBX | mrX86RegSI
+push word x86Retf
+push word valInt
 push word 0x1234
-push word x86SRegDS
-call x86GenOpMemReg
+call x86GenOpImm
 
   call    Cleanup
 
@@ -313,7 +309,7 @@ Error:
 
 bannerString:     db 'Origo86 Alpha',0
 copyrightString:  db 'Copyright 2016 - 2018 Orlando Llanes',0
-usageString:      db 'usage: origo86 source.ret',0
+usageString:      db 'usage: origo86 source[.ret] [binary[.ext]]',0
 
 errorSourceFile:  db 'Unable to open source file',13,10,0
 
