@@ -19,30 +19,51 @@ run:
 
   call    Compile
 
+<<<<<<< HEAD
 push word x86Out
 push word x86RegAL
+=======
+push word x86Shr
+push word x86RegBH
+>>>>>>> 2088dd42c649d29b7f654148d925fa6541166ab1
 push word valInt8
 push word 0x12
 call x86GenOpRegImm
 
+<<<<<<< HEAD
 push word x86Out
 push word x86RegAL
+=======
+push word x86Shr
+push word x86RegBH
+>>>>>>> 2088dd42c649d29b7f654148d925fa6541166ab1
 push word valUint8
 push word 0x12
 call x86GenOpRegImm
 
+<<<<<<< HEAD
 push word x86Out
 push word x86RegAX
+=======
+push word x86Shr
+push word x86RegSP
+>>>>>>> 2088dd42c649d29b7f654148d925fa6541166ab1
 push word valInt8
 push word 0x12
 call x86GenOpRegImm
 
+<<<<<<< HEAD
 push word x86Out
 push word x86RegAX
+=======
+push word x86Shr
+push word x86RegSP
+>>>>>>> 2088dd42c649d29b7f654148d925fa6541166ab1
 push word valUint8
 push word 0x12
 call x86GenOpRegImm
 
+<<<<<<< HEAD
 push word x86Out
 push word x86RegAX
 push word valInt
@@ -54,6 +75,19 @@ push word x86RegAX
 push word valUint
 push word 0x1234
 call x86GenOpRegImm
+=======
+push word x86Shr
+push word x86RegSP
+push word valInt
+push word 0x1234
+call x86GenOpRegImm
+
+push word x86Shr
+push word x86RegSP
+push word valUint
+push word 0x1234
+call x86GenOpRegImm
+>>>>>>> 2088dd42c649d29b7f654148d925fa6541166ab1
 
   call    Cleanup
 
