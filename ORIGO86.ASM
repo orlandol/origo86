@@ -11,7 +11,7 @@ run:
 
   %define count bp - 2
   push    word 0
-
+        
   call    ParseOptions
 
   call    OpenRet
@@ -19,41 +19,41 @@ run:
 
   call    Compile
 
-push word x86Push 
-push word 1
-push word 0
-push word 0
-call x86GenOpMem
+push word x86Shr
+push word x86RegBH
+push word valInt8
+push word 0x12
+call x86GenOpRegImm
 
-push word x86Push 
-push word 1
-push word mrX86RegBX + mrX86RegDI
-push word 0
-call x86GenOpMem
+push word x86Shr
+push word x86RegBH
+push word valUint8
+push word 0x12
+call x86GenOpRegImm
 
-push word x86Push 
-push word 1
-push word mrX86RegBX + mrX86RegDI
+push word x86Shr
+push word x86RegSP
+push word valInt8
+push word 0x12
+call x86GenOpRegImm
+
+push word x86Shr
+push word x86RegSP
+push word valUint8
+push word 0x12
+call x86GenOpRegImm
+
+push word x86Shr
+push word x86RegSP
+push word valInt
 push word 0x1234
-call x86GenOpMem
+call x86GenOpRegImm
 
-push word x86Push 
-push word 2
-push word 0
+push word x86Shr
+push word x86RegSP
+push word valUint
 push word 0x1234
-call x86GenOpMem
-
-push word x86Push 
-push word 2
-push word mrX86RegBX + mrX86RegDI
-push word 0x1234
-call x86GenOpMem
-
-push word x86Push 
-push word 2
-push word mrX86RegBX + mrX86RegDI
-push word 0x1234
-call x86GenOpMem
+call x86GenOpRegImm
 
   call    Cleanup
 
