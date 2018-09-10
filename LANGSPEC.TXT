@@ -1051,3 +1051,4 @@
   [^] sal                        => shl
   [^] shr MEM8',' CL             => 1101_0010, MOD_101_MEM8[, <DISP8 | DISP16>]
   [^] shr MEM16',' CL            => 1101_0011, MOD_101_MEM16[, <DISP8 | DISP16>]
+
