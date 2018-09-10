@@ -19,25 +19,41 @@ run:
 
   call    Compile
 
-push word x86Retf
-push word valUint8
+push word x86Push 
+push word 1
 push word 0
-call x86GenOpImm
-
-push word x86Retf
-push word valInt8
 push word 0
-call x86GenOpImm
+call x86GenOpMem
 
-push word x86Retf
-push word valUint
-push word 0x1234
-call x86GenOpImm
+push word x86Push 
+push word 1
+push word mrX86RegBX + mrX86RegDI
+push word 0
+call x86GenOpMem
 
-push word x86Retf
-push word valInt
+push word x86Push 
+push word 1
+push word mrX86RegBX + mrX86RegDI
 push word 0x1234
-call x86GenOpImm
+call x86GenOpMem
+
+push word x86Push 
+push word 2
+push word 0
+push word 0x1234
+call x86GenOpMem
+
+push word x86Push 
+push word 2
+push word mrX86RegBX + mrX86RegDI
+push word 0x1234
+call x86GenOpMem
+
+push word x86Push 
+push word 2
+push word mrX86RegBX + mrX86RegDI
+push word 0x1234
+call x86GenOpMem
 
   call    Cleanup
 

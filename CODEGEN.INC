@@ -193,7 +193,7 @@ x86GenRepOp:
 
 ;
 ; func bool x86GenOpImm( uint op, immType, imm )
-;;;
+;
 x86GenOpImm:
   push    bp
   mov     bp, sp
@@ -468,7 +468,7 @@ x86GenOpReg:
   mov     ah, 0b11_010_000
   add     ah, cl
   cmp     si, x86Reg16
-  je      .Emit
+  je      .Emit16
   xor     ax, ax
   jmp     .Exit
  .NotCall:
@@ -476,20 +476,128 @@ x86GenOpReg:
   cmp     bx, x86Not
   jne     .NotNot
   mov     al, 0b1111_0110
-  mov     ah, 0b11_010_000
-  add     ah, cl
+  add     cl, 0b11_010_000
+  mov     ah, cl
+  jmp     .ProcessDest
  .NotNot:
 
-  cmp     si, x86Reg8
-  je      .Emit
-  inc     al
+  cmp     bx, x86Dec
+  jne     .NotDec
+  mov     al, 0b1111_1110
+  add     cl, 0b11_001_000
+  mov     ah, cl
+  jmp     .ProcessDest
+ .NotDec:
+
+  cmp     bx, x86Div
+  jne     .NotDiv
+  mov     al, 0b1111_0110
+  add     cl, 0b11_110_000
+  mov     ah, cl
+  jmp     .ProcessDest
+ .NotDiv:
+
+  cmp     bx, x86IDiv
+  jne     .NotIDiv
+  mov     al, 0b1111_0110
+  add     cl, 0b11_111_000
+  mov     ah, cl
+  jmp     .ProcessDest
+ .NotIDiv:
+
+  cmp     bx, x86IMul
+  jne     .NotIMul
+  mov     al, 0b1111_0110
+  add     cl, 0b11_101_000
+  mov     ah, cl
+  jmp     .ProcessDest
+ .NotIMul:
+
+  cmp     bx, x86Inc
+  jne     .NotInc
+  mov     al, 0b1111_1110
+  add     cl, 0b11_000_000
+  mov     ah, cl
+  jmp     .ProcessDest
+ .NotInc:
+
+  cmp     bx, x86Mul
+  jne     .NotMul
+  mov     al, 0b1111_0110
+  add     cl, 0b11_100_000
+  mov     ah, cl
+  jmp     .ProcessDest
+ .NotMul:
+
+  cmp     bx, x86Jmp
+  jne     .NotJmp
+  mov     al, 0b1111_1111
+  add     cl, 0b11_100_000
+  mov     ah, cl
   cmp     si, x86Reg16
-  je      .Emit
+  je      .Emit16
+  xor     ax, ax
+  jmp     .Exit
+ .NotJmp:
+
+  cmp     bx, x86Neg
+  jne     .NotNeg
+  mov     al, 0b1111_0110
+  add     cl, 0b11_011_000
+  mov     ah, cl
+  jmp     .ProcessDest
+ .NotNeg:
+
+  cmp     bx, x86Pop
+  jne     .NotPop
+  mov     al, 0b0101_1_000
+  add     al, cl
+  cmp     si, x86Reg16
+  je      .Emit8
+  mov     al, 0b000_000_111
+  shl     cl, 3
+  add     al, cl
+  cmp     si, x86SReg
+  je      .Emit8
+  xor     ax, ax
+  jmp     .Exit
+ .NotPop:
+
+  cmp     bx, x86Push
+  jne     .NotPush
+  mov     al, 0b0101_0_000
+  add     al, cl
+  cmp     si, x86Reg16
+  je      .Emit8
+  mov     al, 0b000_000_110
+  shl     cl, 3
+  add     al, cl
+  cmp     si, x86SReg
+  je      .Emit8
+  xor     ax, ax
+  jmp     .Exit
+ .NotPush:
 
   xor     ax, ax
   jmp     .Exit
 
- .Emit:
+ .ProcessDest:
+  cmp     si, x86Reg8
+  je      .Emit16
+  inc     al
+  cmp     si, x86Reg16
+  je      .Emit16
+
+  xor     ax, ax
+  jmp     .Exit
+
+ .Emit8:
+  lea     bx, [instruction]
+  mov     [bx + 0], al
+  mov     cx, 1
+  jmp     .EmitInstruction
+
+ .Emit16:
   lea     bx, [instruction]
   mov     [bx + 0], ax
   mov     cx, 2
@@ -518,7 +626,7 @@ x86GenOpReg:
 ;
 ; func bool x86GenOpMem( uint op, uint memSize,
 ;   uint memRegs, int displacement )
-;
+;;;
 x86GenOpMem:
   push    bp
   mov     bp, sp
@@ -540,8 +648,108 @@ x86GenOpMem:
   jne     .NotNot
   mov     al, 0b1111_0110
   mov     ah, 0b00_010_000
+  jmp     .ProcessDest
  .NotNot:
 
+  cmp     bx, x86Call
+  jne     .NotCall
+  mov     al, 0b1111_1111
+  mov     ah, 0b00_010_000
+  cmp     word [memSize], 2
+  je      .ProcessRM
+  mov     ah, 0b00_011_000
+  cmp     word [memSize], 4
+  je      .ProcessRM
+  xor     ax, ax
+  jmp     .Exit
+ .NotCall:
+
+  cmp     bx, x86Jmp
+  jne     .NotJmp
+  mov     al, 0b1111_1111
+  mov     ah, 0b00_100_000
+  cmp     word [memSize], 2
+  je      .ProcessRM
+  mov     ah, 0b00_101_000
+  cmp     word [memSize], 4
+  je      .ProcessRM
+  xor     ax, ax
+  jmp     .Exit
+ .NotJmp:
+
+  cmp     bx, x86Dec
+  jne     .NotDec
+  mov     al, 0b1111_1110
+  mov     ah, 0b00_001_000
+  jmp     .ProcessDest
+ .NotDec:
+
+  cmp     bx, x86Div
+  jne     .NotDiv
+  mov     al, 0b1111_0110
+  mov     ah, 0b00_110_000
+  jmp     .ProcessDest
+ .NotDiv:
+
+  cmp     bx, x86IDiv
+  jne     .NotIDiv
+  mov     al, 0b1111_0110
+  mov     ah, 0b00_111_000
+  jmp     .ProcessDest
+ .NotIDiv:
+
+  cmp     bx, x86IMul
+  jne     .NotIMul
+  mov     al, 0b1111_0110
+  mov     ah, 0b00_101_000
+  jmp     .ProcessDest
+ .NotIMul:
+
+  cmp     bx, x86Inc
+  jne     .NotInc
+  mov     al, 0b1111_1110
+  mov     ah, 0b00_000_000
+  jmp     .ProcessDest
+ .NotInc:
+
+  cmp     bx, x86Mul
+  jne     .NotMul
+  mov     al, 0b1111_0110
+  mov     ah, 0b00_100_000
+  jmp     .ProcessDest
+ .NotMul:
+
+  cmp     bx, x86Neg
+  jne     .NotNeg
+  mov     al, 0b1111_0110
+  mov     ah, 0b00_011_000
+  jmp     .ProcessDest
+ .NotNeg:
+
+  cmp     bx, x86Pop
+  jne     .NotPop
+  mov     al, 0b1000_1111
+  mov     ah, 0b00_000_000
+  cmp     word [memSize], 2
+  je      .ProcessRM
+  xor     ax, ax
+  jmp     .Exit
+ .NotPop:
+
+  cmp     bx, x86Push
+  jne     .NotPush
+  mov     al, 0b1111_1111
+  mov     ah, 0b00_110_000
+  cmp     word [memSize], 2
+  je      .ProcessRM
+  xor     ax, ax
+  jmp     .Exit
+ .NotPush:
+
+  xor     ax, ax
+  jmp     .Exit
+
+ .ProcessDest:
   cmp     word [memSize], 1
   je      .ProcessRM
   inc     al
@@ -837,15 +1045,12 @@ x86GenOpRegMem:
 
   cmp     bx, x86Mov
   jne     .NotMov
-  cmp     di, x86SReg
-  jne     .NotMovSReg
+  shl     cl, 3
   mov     al, 0b1000_1110
-  shl     cl, 3
   mov     ah, cl
-  jmp     .ProcessRM
- .NotMovSReg:
+  cmp     di, x86SReg
+  je      .ProcessRM
   mov     al, 0b1000_1010
-  shl     cl, 3
   mov     ah, cl
   jmp     .ProcessDest
  .NotMov:
@@ -929,6 +1134,33 @@ x86GenOpRegMem:
   mov     ah, cl
   jmp     .ProcessDest
  .NotXor:
+
+  cmp     bx, x86Lds
+  jne     .NotLds
+  mov     al, 0b1100_0101
+  shl     cl, 3
+  mov     ah, cl
+  cmp     di, x86Reg16
+  je      .ProcessRM
+ .NotLds:
+
+  cmp     bx, x86Les
+  jne     .NotLes
+  mov     al, 0b1100_0100
+  shl     cl, 3
+  mov     ah, cl
+  cmp     di, x86Reg16
+  je      .ProcessRM
+ .NotLes:
+
+  cmp     bx, x86Lea
+  jne     .NotLea
+  mov     al, 0b1000_1101
+  shl     cl, 3
+  mov     ah, cl
+  cmp     di, x86Reg16
+  je      .ProcessRM
+ .NotLea:
 
   xor     ax, ax
   jmp     .Exit
