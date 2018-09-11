@@ -3,7 +3,7 @@
 
   %include "defs.inc"
 
-  InitRTL
+  %include "initrtl.inc"
 
 run:
   push    bp
@@ -19,41 +19,15 @@ run:
 
   call    Compile
 
-push word x86Out
-push word x86RegAL
-push word valInt8
-push word 0x12
-call x86GenOpRegImm
+push word x86Shr
+push word x86RegBH
+push word x86RegCL
+call x86GenOpRegReg
 
-push word x86Out
-push word x86RegAL
-push word valUint8
-push word 0x12
-call x86GenOpRegImm
-
-push word x86Out
-push word x86RegAX
-push word valInt8
-push word 0x12
-call x86GenOpRegImm
-
-push word x86Out
-push word x86RegAX
-push word valUint8
-push word 0x12
-call x86GenOpRegImm
-
-push word x86Out
-push word x86RegAX
-push word valInt
-push word 0x1234
-call x86GenOpRegImm
-
-push word x86Out
-push word x86RegAX
-push word valUint
-push word 0x1234
-call x86GenOpRegImm
+push word x86Shr
+push word x86RegSP
+push word x86RegCL
+call x86GenOpRegReg
 
   call    Cleanup
 

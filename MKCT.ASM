@@ -3,7 +3,7 @@
 
   %include "defs.inc"
 
-  InitRTL
+  %include "initrtl.inc"
 
 run:
   or      byte [chtable + 0x09], chSpace
