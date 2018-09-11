@@ -1171,7 +1171,7 @@ x86GenOpRegImm:
 
 ;
 ; func bool x86GenOpRegReg( uint op, uint destReg, uint srcReg )
-;;;
+;
 x86GenOpRegReg:
   push    bp
   mov     bp, sp
@@ -1705,7 +1705,7 @@ x86GenOpRegMem:
 ;
 ; func bool x86GenOpMemImm( uint op, uint memRegs, int16 displacement,
 ;   uint immType, uint imm )
-;
+;;;
 x86GenOpMemImm:
   push    bp
   mov     bp, sp
@@ -1717,9 +1717,9 @@ x86GenOpMemImm:
   %define imm          bp + 4
 
   %define instruction  bp - 6
-  push    word 0x9999
-  push    word 0x9999
-  push    word 0x9999
+  push    word 0
+  push    word 0
+  push    word 0
 
   ; Registers
   ; ax = opcode:modRM                   si = memRegs
@@ -1746,24 +1746,148 @@ x86GenOpMemImm:
 
  .ImmInitialized:
   mov     [imm], ax
+  xor     ax, ax
 
   cmp     bx, x86Mov
   jne     .NotMov
-  mov     ah, 0           ; ModReg
   mov     al, 0b1100_0110 ; Opcode
-
-  cmp     di, valInt
-  je      .Mov16
-  cmp     di, valUint
-  je      .Mov16
-  jmp     .ProcessRM
- .Mov16:
-  inc     al
   jmp     .ProcessRM
  .NotMov:
 
+  cmp     bx, x86Rcl
+  jne     .NotRcl
+  mov     ah, 0b00_010_000
+  mov     al, 0b1100_0000
+  mov     di, valUint8
+  jmp     .ProcessRM
+ .NotRcl:
+
+  cmp     bx, x86Rcr
+  jne     .NotRcr
+  mov     ah, 0b00_011_000
+  mov     al, 0b1100_0000
+  mov     di, valUint8
+  jmp     .ProcessRM
+ .NotRcr:
+
+  cmp     bx, x86Rol
+  jne     .NotRol
+  ;mov     ah, 0b00_000_000
+  mov     al, 0b1100_0000
+  mov     di, valUint8
+  jmp     .ProcessRM
+ .NotRol:
+
+  cmp     bx, x86Ror
+  jne     .NotRor
+  mov     ah, 0b00_001_000
+  mov     al, 0b1100_0000
+  mov     di, valUint8
+  jmp     .ProcessRM
+ .NotRor:
+
+  cmp     bx, x86Sar
+  jne     .NotSar
+  mov     ah, 0b00_111_000
+  mov     al, 0b1100_0000
+  mov     di, valUint8
+  jmp     .ProcessRM
+ .NotSar:
+
+  cmp     bx, x86Sal
+  je      .IsSal
+  cmp     bx, x86Shl
+  jne     .NotShl
+ .IsSal:
+  mov     ah, 0b00_100_000
+  mov     al, 0b1100_0000
+  mov     di, valUint8
+  jmp     .ProcessRM
+ .NotShl:
+
+  cmp     bx, x86Shr
+  jne     .NotShr
+  mov     ah, 0b00_101_000
+  mov     al, 0b1100_0000
+  mov     di, valUint8
+  jmp     .ProcessRM
+ .NotShr:
+
+  cmp     bx, x86Test
+  jne     .NotTest
+  ;mov     ah, 0b00_000_000
+  mov     al, 0b1111_0110
+  cmp     di, valInt8
+  je      .ProcessRM
+  cmp     di, valUint8
+  je      .ProcessRM
+  inc     al
+  jmp     .ProcessRM
+ .NotTest:
+
+  mov     al, 0b1000_0000
+
+  cmp     bx, x86Adc
+  jne     .NotAdc
+  mov     ah, 0b00_010_000
+  jmp     .ProcessOp
+ .NotAdc:
+
+  cmp     bx, x86Add
+  jne     .NotAdd
+  ;mov     ah, 0b00_000_000
+  jmp     .ProcessOp
+ .NotAdd:
+
+  cmp     bx, x86And
+  jne     .NotAnd
+  mov     ah, 0b00_100_000
+  jmp     .ProcessOp
+ .NotAnd:
+
+  cmp     bx, x86Cmp
+  jne     .NotCmp
+  mov     ah, 0b00_111_000
+  jmp     .ProcessOp
+ .NotCmp:
+
+  cmp     bx, x86Or
+  jne     .NotOr
+  mov     ah, 0b00_001_000
+  jmp     .ProcessOp
+ .NotOr:
+
+  cmp     bx, x86Sbb
+  jne     .NotSbb
+  mov     ah, 0b00_011_000
+  jmp     .ProcessOp
+ .NotSbb:
+
+  cmp     bx, x86Sub
+  jne     .NotSub
+  mov     ah, 0b00_101_000
+  jmp     .ProcessOp
+ .NotSub:
+
+  cmp     bx, x86Xor
+  jne     .NotXor
+  mov     ah, 0b00_110_000
+  jmp     .ProcessOp
+ .NotXor:
+
   xor     ax, ax
   jmp     .Exit
+
+ .ProcessOp:
+  cmp     di, valUint8
+  je      .ProcessRM
+  inc     al
+  cmp     di, valInt
+  je      .ProcessRM
+  cmp     di, valUint
+  je      .ProcessRM
+  add     al, 0b10
+  jmp     .ProcessRM
 
  .ProcessRM:
   test    si, si
@@ -1802,10 +1926,16 @@ x86GenOpMemImm:
  .ProcessImm:
   mov     cx, [imm]
 
+  cmp     di, valInt8
+  je      .EmitImm8
+  cmp     di, valUint8
+  je      .EmitImm8
   cmp     di, valInt
   je      .EmitImm16
   cmp     di, valUint
   je      .EmitImm16
+  xor     ax, ax
+  jmp     .Exit
 
  .EmitImm8:
   lea     bx, [instruction]
