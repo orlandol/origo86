@@ -1,3 +1,4 @@
+section .data
 ;
 ; Sorted general keyword token list
 ;

@@ -1,3 +1,4 @@
+section .data
 opTable:
 .itemIsNot:        db "!", 0, 0, 0
                    dw unaryIsNot, 0

@@ -1,3 +1,4 @@
+section .text
 ;
 ; func bool x86GenOp( uint op )
 ;
@@ -43,6 +44,7 @@ x86GenOp:
   pop     bp
   ret 2
 
+section .data
 x86SingleByteOpTable:
   db 0b1001_1000 ; x86Cbw
   db 0b1001_1001 ; x86Cwd
@@ -65,6 +67,7 @@ x86SingleByteOpTable:
   db 0b1101_0111 ; x86Xlat
   db 0b1101_0111 ; x86Xlatb
 
+section .text
 ;
 ; func bool x86GenRepOp( uint repOp, uint op )
 ;
@@ -834,6 +837,7 @@ x86GenOpMem:
   pop     bp
   ret 8
 
+section .data
 x86RMTable:
   db 0b00_111_000 ;  0 - Invalid
   db 0b00_000_101 ;  1 - [DI]
@@ -852,6 +856,7 @@ x86RMTable:
   db 0b00_111_000 ; 14 - Invalid
   db 0b00_111_000 ; 15 - Invalid
 
+section .text
 ;
 ; func bool x86GenOpRegImm( uint op, uint destReg, uint immType, uint imm )
 ;
@@ -1705,7 +1710,7 @@ x86GenOpRegMem:
 ;
 ; func bool x86GenOpMemImm( uint op, uint memRegs, int16 displacement,
 ;   uint immType, uint imm )
-;;;
+;
 x86GenOpMemImm:
   push    bp
   mov     bp, sp

@@ -5,6 +5,7 @@
 
   %include "initrtl.inc"
 
+section .text
 run:
   or      byte [chtable + 0x09], chSpace
   or      byte [chtable + 0x0A], chSpace
@@ -61,6 +62,9 @@ run:
   inc     bx
   jmp     SetHex
  ExitSetHex:
+
+  push    strSection
+  call    echostring
 
   push    tableName
   call    echostring
@@ -164,10 +168,12 @@ run:
   mov     ax, 0x4C00
   int     0x21
 
+section .data
 chr:    dw 0
 code:   dw 0
 count:  dw 256
 
+strSection: db 'section .data',13,10,0
 tableName: db 'chTable:',13,10,0
 prefix:    db '  db ',0
 suffix:    db ' ; ',0

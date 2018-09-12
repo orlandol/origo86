@@ -1,3 +1,4 @@
+section .text
 ;
 ; func dump()
 ;
@@ -132,8 +133,11 @@ dumphex16:
   mov     sp, bp
   pop     bp
   ret 4
+
+section .data
  hexDigits: db '0123456789ABCDEF'
 
+section .text
 ;
 ; func dumpu16( char[5] dest, uint16 value )
 ;
@@ -166,6 +170,7 @@ dumpu16:
   pop     bp
   ret 2
 
+section .data
 dumpLine1: db '  --  Registers --------------------------',13,10,
 dumpLine2: db '  ax = 0x0000 (00000)  bx = 0x0000 (00000)',13,10,
 dumpLine3: db '  cx = 0x0000 (00000)  dx = 0x0000 (00000)',13,10,

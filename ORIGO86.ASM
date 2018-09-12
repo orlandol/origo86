@@ -1,10 +1,11 @@
- 
+
   ORG 0x100
 
   %include "defs.inc"
 
   %include "initrtl.inc"
 
+section .text
 run:
   push    bp
   mov     bp, sp
@@ -309,12 +310,7 @@ Error:
   pop     bp
   ret 2
 
-%include "scan.inc"
-%include "parse.inc"
-%include "expr.inc"
-%include "codegen.inc"
-%include "symtab.inc"
-
+section .data
 bannerString:     db 'Origo86 Alpha',0
 copyrightString:  db 'Copyright 2016 - 2018 Orlando Llanes',0
 usageString:      db 'usage: origo86 source[.ret] [binary[.ext]]',0
@@ -371,4 +367,9 @@ nextString: times (STRING_MAXLEN + 1) db 0
 
 %include "debug.inc"
 %include "rtl.inc"
-
+                     
+%include "scan.inc"
+%include "parse.inc"
+%include "expr.inc"
+%include "codegen.inc"
+%include "symtab.inc"

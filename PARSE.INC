@@ -1,3 +1,4 @@
+section .text
 ;
 ; func Compile()
 ;
@@ -80,17 +81,6 @@ ParseRun:
   push    word valUint8
   push    word 0x21
   call    x86GenOpImm
-
-  ; mov ax, 0x4C00/int 0x21 in reverse order because of stack
-;  push    word 0x0021
-;  push    word 0xCD4C
-;  push    word 0x00B8
-
-;  push    word [binary]
-;  lea     di, [bp - 6]
-;  push    di
-;  push    word 5
-;  call    fwrite
   jmp     .Done
  .NotEnd:
 
@@ -105,6 +95,7 @@ ParseRun:
   pop     bp
   ret
 
+section .data
 entryPoint: dw 0xFFFF
 errDuplicateRun: db 'run already defined',0
 strRunUndefined: db 'run undefined',0

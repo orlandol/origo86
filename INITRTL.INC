@@ -1,7 +1,7 @@
 ;
 ; InitRTL
 ;
-;..start:
+section .text
   cld
 
   ; Attempt mem resize to 64K

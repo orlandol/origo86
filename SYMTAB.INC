@@ -1,3 +1,4 @@
+section .text
 ;
 ; func bool DeclareNamespace( string name )
 ;

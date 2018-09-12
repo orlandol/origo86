@@ -3,6 +3,7 @@
 ; 54K - Data
 ;  2K - Stack
 
+section .text
 ;
 ; func int compare( string left, string right )
 ;
@@ -502,6 +503,7 @@ fseekby:
   pop     bp
   ret 6
 
+section .data
 minMemString:     db 'Error: Need 64K to run.',13,10,13,10,0
 
 eoln: db 13,10,0
@@ -514,4 +516,6 @@ argstr: times 128 db 0
 maxAvail: dw 0
 memAvail: dw 0
 
-heapData:
+section .bss
+heapData: resb SIZE_HEAPDATA
+heapDataEnd:

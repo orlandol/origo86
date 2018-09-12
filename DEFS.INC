@@ -4,8 +4,6 @@
   %define SIZE_HEAPDATA (54 * 1024)
   %define SIZE_STACK     (2 * 1024)
 
-  %define heapDataEnd (heapData + SIZE_HEAPDATA)
-
   ; Origo declarations
   %define IDENT_MAXLEN    31
   %define STRING_MAXLEN   255
