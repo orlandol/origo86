@@ -1,5 +1,6 @@
 
   ORG 0x100
+  CPU 286
 
   %include "defs.inc"
 
