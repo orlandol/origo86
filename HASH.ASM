@@ -64,25 +64,23 @@ Hash:
   cmp     byte [si], 0
   je      .Exit
 
-  xor     ax, ax
   mov     ah, [si]
-  xor     cx, cx
+  mov     al, ah
+  not     al
 
   ; .09AZ_az
  .CalcHash:
-  mov     cl, [si]
+  mov     bl, [si]
   inc     si
-  test    cl, cl
+  test    bl, bl
   jz      .ExitCalcHash
 
-  inc     al
-  add     bl, cl
+  add     bx, bx
+  xor     ax, [bx + hashBits]
 
+  xor     bx, bx
   jmp     .CalcHash
  .ExitCalcHash:
-
-  add     al, byte [si - 1]
-  xor     ax, bx
 
  .Exit:
   mov     sp, bp
@@ -90,6 +88,80 @@ Hash:
   ret 2
 
 section .data
+  ; EARIOTNSLCUDPMHGBFYWKVXZJQ
+  ; Letter frequency from Robert Lewand's Cryptological Mathematics
+  ;   cited by Pavel Micka per Wikipedia - Letter Frequency
+  hashBits:
+                          times 45 dw 0
+    dw 0b0001000000001000 ; .
+                          times 1 dw 0
+    dw 0b0000000000000000 ; 0
+    dw 0b0000000000000000 ; 1
+    dw 0b0000000000000000 ; 2
+    dw 0b0000000000000000 ; 3
+    dw 0b0000000000000000 ; 4
+    dw 0b0000000000000000 ; 5
+    dw 0b0000000000000000 ; 6
+    dw 0b0000000000000000 ; 7
+    dw 0b0000000000000000 ; 8
+    dw 0b0000000000000000 ; 9
+                          times 7 dw 0
+    dw 0b0000000000000000 ; A
+    dw 0b0000000000000000 ; B
+    dw 0b0000000000000000 ; C
+    dw 0b0000000000000000 ; D
+    dw 0b0000000000000000 ; E
+    dw 0b0000000000000000 ; F
+    dw 0b0000000000000000 ; G
+    dw 0b0000000000000000 ; H
+    dw 0b0000000000000000 ; I
+    dw 0b0000000000000000 ; J
+    dw 0b0000000000000000 ; K
+    dw 0b0000000000000000 ; L
+    dw 0b0001000000001000 ; M
+    dw 0b0000001000000010 ; N
+    dw 0b0000000000000001 ; O
+    dw 0b0010000000001000 ; P
+    dw 0b0000010000000100 ; Q
+    dw 0b0001000000100000 ; R
+    dw 0b0000101000000000 ; S
+    dw 0b1000000000000010 ; T
+    dw 0b0000000000010000 ; U
+    dw 0b0010000000000100 ; V
+    dw 0b0000010000100000 ; W
+    dw 0b0001000000000001 ; X
+    dw 0b0000000000001000 ; Y
+    dw 0b0010000001000000 ; Z
+                          times 4 dw 0
+    dw 0b0000100100000000 ; _
+                          times 1 dw 0
+    dw 0b1000000000000000 ; a
+    dw 0b0000000100001000 ; b
+    dw 0b0000100000000001 ; c
+    dw 0b0000000000010100 ; d
+    dw 0b0000000001000000 ; e
+    dw 0b0001010000000000 ; f
+    dw 0b0010000000000000 ; g
+    dw 0b0100000000000010 ; h
+    dw 0b1000000000000000 ; i
+    dw 0b0010000000100000 ; j
+    dw 0b0010000100000000 ; k
+    dw 0b0000000000101000 ; l
+    dw 0b0000000101000000 ; m
+    dw 0b0100100000000000 ; n
+    dw 0b0000000010000000 ; o
+    dw 0b0000000000010010 ; p
+    dw 0b0000001001000000 ; q
+    dw 0b1000010000000000 ; r
+    dw 0b0000000000100001 ; s
+    dw 0b0001010000000000 ; t
+    dw 0b0000100000000000 ; u
+    dw 0b0000000100001000 ; v
+    dw 0b0001000000000001 ; w
+    dw 0b0100000010000000 ; x
+    dw 0b0000001000000000 ; y
+    dw 0b1000000000010000 ; z
+
   testStrings:
     db 'origo', 0
     db 'Origo', 0
