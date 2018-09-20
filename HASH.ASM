@@ -15,8 +15,8 @@ run:
   push    word testStrings
 
  .HashLoop:
-  cmp     word [hashStr], testStringsEnd
 ;  cmp     word [hashStr], identStrings
+  cmp     word [hashStr], testStringsEnd
   jae     .ExitHashLoop
   push    word [hashStr]
   call    echostring
@@ -64,19 +64,18 @@ Hash:
   cmp     byte [si], 0
   je      .Exit
 
-  mov     ah, [si]
-  mov     al, ah
-  not     al
+  xor     bx, bx
 
   ; .09AZ_az
  .CalcHash:
   mov     bl, [si]
   inc     si
-  test    bl, bl
+  add     bx, bx
   jz      .ExitCalcHash
 
-  add     bx, bx
   xor     ax, [bx + hashBits]
+  rol     ax, 12
+  add     ax, bx
 
   xor     bx, bx
   jmp     .CalcHash
@@ -95,16 +94,27 @@ section .data
                           times 45 dw 0
     dw 0b0001000000001000 ; .
                           times 1 dw 0
-    dw 0b0100001000000010 ; 0
-    dw 0b0000100100000100 ; 1
-    dw 0b1010000000010000 ; 2
-    dw 0b0000100100000100 ; 3
-    dw 0b0010000001000001 ; 4
-    dw 0b1000000100010000 ; 5
-    dw 0b0000100001000100 ; 6
-    dw 0b0010000100000001 ; 7
-    dw 0b1000100000000100 ; 8
-    dw 0b0010000001010000 ; 9
+;    dw 0b0100001000000010 ; 0
+;    dw 0b0000100100000100 ; 1
+;    dw 0b1010000000010000 ; 2
+;    dw 0b0000100100000100 ; 3
+;    dw 0b0010000001000001 ; 4
+;    dw 0b1000000100010000 ; 5
+;    dw 0b0000100001000100 ; 6
+;    dw 0b0010000100000001 ; 7
+;    dw 0b1000100000000100 ; 8
+;    dw 0b0010000001010000 ; 9
+
+    dw 0b0100000000000010 ; 0
+    dw 0b0000000100001000 ; 1
+    dw 0b1010000000000000 ; 2
+    dw 0b0000100000000100 ; 3
+    dw 0b0010000001000000 ; 4
+    dw 0b1000000000010000 ; 5
+    dw 0b0000100001000000 ; 6
+    dw 0b0000000100000001 ; 7
+    dw 0b1000000000000100 ; 8
+    dw 0b0010000000010000 ; 9
                           times 7 dw 0
     dw 0b0000000000100000 ; A
     dw 0b1000100000000000 ; B
