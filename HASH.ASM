@@ -75,7 +75,7 @@ Hash:
 
   xor     ax, [bx + hashBits]
   rol     ax, 1
-  add     ax, 10142
+  add     ax, 10141
   xor     ax, bx
 
   xor     bx, bx
