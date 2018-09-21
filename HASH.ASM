@@ -74,8 +74,9 @@ Hash:
   jz      .ExitCalcHash
 
   xor     ax, [bx + hashBits]
-  rol     ax, 12
-  add     ax, bx
+  rol     ax, 1
+  add     ax, 10142
+  xor     ax, bx
 
   xor     bx, bx
   jmp     .CalcHash
