@@ -15,8 +15,9 @@ run:
   push    word testStrings
 
  .HashLoop:
+  cmp     word [hashStr], origoStrings
 ;  cmp     word [hashStr], identStrings
-  cmp     word [hashStr], testStringsEnd
+;  cmp     word [hashStr], testStringsEnd
   jae     .ExitHashLoop
   push    word [hashStr]
   call    echostring
@@ -74,7 +75,7 @@ Hash:
   jz      .ExitCalcHash
 
   xor     ax, [bx + hashBits]
-  rol     ax, 1
+  rol     ax, 5
   add     ax, 10141
   xor     ax, bx
 
@@ -174,6 +175,41 @@ section .data
     dw 0b1000000000010000 ; z
 
   testStrings:
+  keywordStrings:
+    db "enum",0
+    db "internal",0
+    db "object",0
+    db "program",0
+    db "public",0
+    db "struct",0
+    db "visible",0
+    db "extends",0
+    db "private",0
+    db "interface",0
+    db "implements",0
+    db "method",0
+    db "self",0
+    db "func",0
+    db "asm",0
+    db "noret",0
+    db "noframe",0
+    db "return",0
+    db "var",0
+    db "run",0
+    db "end",0
+    db "if",0
+    db "then",0
+    db "thenif",0
+    db "elseif",0
+    db "else",0
+    db "endif",0
+    db "while",0
+    db "next",0
+    db "break",0
+    db "endwhile",0
+    db "in",0
+    db "exit",0
+  origoStrings:
     db 'origo', 0
     db 'Origo', 0
     db 'ORigo', 0
