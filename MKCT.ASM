@@ -44,25 +44,34 @@ run:
   jmp     SetAlpha2
  ExitSetAlpha2:
 
-  or      byte [chtable + '0'], chBin | chOct | chHex | chDigit
-  or      byte [chtable + '1'], chBin | chOct | chHex | chDigit
-  or      byte [chtable + '2'], chOct | chHex | chDigit
-  or      byte [chtable + '3'], chOct | chHex | chDigit
-  or      byte [chtable + '4'], chOct | chHex | chDigit
-  or      byte [chtable + '5'], chOct | chHex | chDigit
-  or      byte [chtable + '6'], chOct | chHex | chDigit
-  or      byte [chtable + '7'], chOct | chHex | chDigit
-  or      byte [chtable + '8'], chHex | chDigit
-  or      byte [chtable + '9'], chHex | chDigit
+  or      byte [chtable + '0'], chPrint | chBin | chOct | chHex | chDigit
+  or      byte [chtable + '1'], chPrint | chBin | chOct | chHex | chDigit
+  or      byte [chtable + '2'], chPrint | chOct | chHex | chDigit
+  or      byte [chtable + '3'], chPrint | chOct | chHex | chDigit
+  or      byte [chtable + '4'], chPrint | chOct | chHex | chDigit
+  or      byte [chtable + '5'], chPrint | chOct | chHex | chDigit
+  or      byte [chtable + '6'], chPrint | chOct | chHex | chDigit
+  or      byte [chtable + '7'], chPrint | chOct | chHex | chDigit
+  or      byte [chtable + '8'], chPrint | chHex | chDigit
+  or      byte [chtable + '9'], chPrint | chHex | chDigit
 
   mov     bx, 'A'
- SetHex:
+ SetHexUpper:
   cmp     bx, 'F'
-  ja      ExitSetHex
+  ja      ExitSetHexUpper
   or      byte [bx + chtable], chHex
   inc     bx
-  jmp     SetHex
- ExitSetHex:
+  jmp     SetHexUpper
+ ExitSetHexUpper:
+
+  mov     bx, 'a'
+ SetHexLower:
+  cmp     bx, 'f'
+  ja      ExitSetHexLower
+  or      byte [bx + chtable], chHex
+  inc     bx
+  jmp     SetHexLower
+ ExitSetHexLower:
 
   push    strSection
   call    echostring

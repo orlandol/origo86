@@ -1,18 +1,20 @@
 
   ORG 0x100
-  CPU 8086
+  CPU 286
 
-  push    bp
-  mov     bp, sp
+section .text
 
-  sub     sp, 4
-  mov     word [bp - 2], 0x1234
-  mov     word [bp - 4], 0x2345
-  call    foo
+  mov dx, 0xFFF
+  mov ax, 0xFFF
+  mul dx
+call dump
 
-  mov     sp, bp
-  pop     bp
+  xor dx, dx
+  mov cx, 0xFFF
+  mov ax, 0xFFF
+  mul cx
+call dump
+  
   int 0x20
 
-foo:
-  ret 4
+  %include "debug.inc"

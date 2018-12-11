@@ -13,7 +13,7 @@ run:
 
   %define count bp - 2
   push    word 0
-        
+
   call    ParseOptions
 
   call    OpenRet
